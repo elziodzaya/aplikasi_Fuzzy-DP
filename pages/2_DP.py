@@ -101,7 +101,7 @@ if uploaded_file:
         # HITUNG BIAYA PER PERIODE
         # =================================================
         results_dp["Import_Cost"] = (
-            results_dp["Import_Optimal"] * import_cost
+            results_dp["Optimal_Import"] * import_cost
         )
         results_dp["Holding_Cost"] = (
             results_dp["Ending_stock"] * holding_cost
@@ -181,5 +181,6 @@ if uploaded_file:
                 file_name="hasil_dp.xlsx",
                 mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
             )
+
 
 
