@@ -10,149 +10,119 @@ st.set_page_config(
 )
 
 # ======================================================
-# GLOBAL CSS
+# GLOBAL STYLE (AMAN)
 # ======================================================
-st.markdown(
-    """
-    <style>
-    body {
-        background: linear-gradient(180deg, #081826 0%, #0b2239 100%);
-        color: #e5e7eb;
-    }
+st.markdown("""
+<style>
+body {
+    background-color: #0b2239;
+    color: #e5e7eb;
+}
 
-    .block-container {
-        padding-top: 40px;
-        max-width: 900px;
-    }
+.block-container {
+    max-width: 900px;
+    padding-top: 50px;
+}
 
-    /* HERO CARD */
-    .hero {
-        background: linear-gradient(180deg, #102a43, #0b2239);
-        border-left: 6px solid #3b82f6;
-        padding: 36px 32px 26px 32px;
-        border-radius: 16px;
-        box-shadow: 0 12px 35px rgba(0,0,0,0.45);
-    }
+.card {
+    background: linear-gradient(180deg, #102a43, #0b2239);
+    border-left: 6px solid #3b82f6;
+    padding: 36px;
+    border-radius: 16px;
+    box-shadow: 0 15px 40px rgba(0,0,0,0.45);
+}
 
-    .hero-title {
-        text-align: center;
-        font-size: 30px;
-        font-weight: 800;
-        line-height: 1.45;
-        color: #ffffff;
-        letter-spacing: 0.4px;
-    }
+.title {
+    text-align: center;
+    font-size: 30px;
+    font-weight: 800;
+    line-height: 1.4;
+    color: white;
+}
 
-    .hero-subtitle {
-        text-align: center;
-        font-size: 15px;
-        color: #cbd5e1;
-        margin-top: 14px;
-    }
+.subtitle {
+    text-align: center;
+    margin-top: 12px;
+    font-size: 15px;
+    color: #cbd5e1;
+}
 
-    .author {
-        text-align: center;
-        font-size: 18px;
-        font-weight: 600;
-        margin: 26px 0 30px 0;
-        color: #f8fafc;
-    }
+.author {
+    text-align: center;
+    margin: 26px 0;
+    font-size: 18px;
+    font-weight: 600;
+}
 
-    .info {
-        background: #0f2a44;
-        padding: 24px;
-        border-radius: 14px;
-        text-align: center;
-        font-size: 14px;
-        color: #e2e8f0;
-        box-shadow: 0 8px 24px rgba(0,0,0,0.35);
-        margin-bottom: 22px;
-    }
+.section {
+    background-color: #0f2a44;
+    padding: 22px;
+    border-radius: 14px;
+    margin-bottom: 20px;
+    font-size: 14px;
+    text-align: center;
+}
 
-    .declaration {
-        background: #081a2c;
-        padding: 24px;
-        border-radius: 14px;
-        font-size: 13px;
-        color: #e5e7eb;
-        box-shadow: 0 8px 24px rgba(0,0,0,0.4);
-        margin-bottom: 10px;
-    }
+.declaration {
+    background-color: #081a2c;
+    padding: 22px;
+    border-radius: 14px;
+    font-size: 13px;
+}
 
-    .declaration-title {
-        text-align: center;
-        font-weight: 600;
-        margin-bottom: 14px;
-        color: #ffffff;
-    }
-
-    /* BUTTON POSITION */
-    .hero-btn-anchor {
-        height: 0;
-    }
-
-    .hero-btn {
-        display: flex;
-        justify-content: center;
-        margin-top: -5px;
-        margin-bottom: 5px;
-    }
-    </style>
-    """,
-    unsafe_allow_html=True
-)
+.declaration h4 {
+    text-align: center;
+    margin-bottom: 12px;
+}
+</style>
+""", unsafe_allow_html=True)
 
 # ======================================================
-# HERO CONTENT (HTML RENDERED SAFELY)
+# MAIN CARD
 # ======================================================
-st.markdown(
-    """
-    <div class="hero">
-        <div class="hero-title">
-            DYNAMIC SYSTEM MODEL TO IMPROVE THE RATIO AND EFFICIENCY IN THE SUPPLY CHAIN
-            MANAGEMENT (SCM) DISTRIBUTION OF THE CEMENT INDUSTRY
-        </div>
-
-        <div class="hero-subtitle">
-            AT BANTEN PROVINCE, INDONESIA
-        </div>
-
-        <div class="author">
-            YUDI MAULANA
-        </div>
-
-        <div class="info">
-            A thesis submitted in fulfilment of the requirement for the award of the<br><br>
-            <b>Doctor of Philosophy in Mechanical Engineering</b><br><br>
-            Faculty of Mechanical and Manufacturing Engineering<br>
-            Universiti Tun Hussein Onn Malaysia<br><br>
-            January 2025
-        </div>
-
-        <div class="declaration">
-            <div class="declaration-title">STUDENT DECLARATION</div>
-            “I hereby declare that the work in this thesis is my own except for quotations
-            and summaries which have been duly acknowledged.”<br><br>
-
-            <b>Student:</b> Yudi Maulana<br>
-            <b>Date:</b> 22 January 2025<br><br>
-
-            <b>Supervisor:</b> Prof. Ir. Ts. Dr. Bukhari Bin Manshoor<br>
-            <b>Supervisor:</b> Ir. Dr.-Eng. Mairiza Zainuddin
-        </div>
-
-        <div class="hero-btn-anchor"></div>
+st.markdown("""
+<div class="card">
+    <div class="title">
+        DYNAMIC SYSTEM MODEL TO IMPROVE THE RATIO AND EFFICIENCY IN THE SUPPLY CHAIN
+        MANAGEMENT (SCM) DISTRIBUTION OF THE CEMENT INDUSTRY
     </div>
-    """,
-    unsafe_allow_html=True
-)
+
+    <div class="subtitle">
+        AT BANTEN PROVINCE, INDONESIA
+    </div>
+
+    <div class="author">
+        YUDI MAULANA
+    </div>
+
+    <div class="section">
+        A thesis submitted in fulfilment of the requirement for the award of the<br><br>
+        <b>Doctor of Philosophy in Mechanical Engineering</b><br><br>
+        Faculty of Mechanical and Manufacturing Engineering<br>
+        Universiti Tun Hussein Onn Malaysia<br><br>
+        January 2025
+    </div>
+
+    <div class="declaration">
+        <h4>STUDENT DECLARATION</h4>
+        “I hereby declare that the work in this thesis is my own except for quotations
+        and summaries which have been duly acknowledged.”<br><br>
+
+        <b>Student:</b> Yudi Maulana<br>
+        <b>Date:</b> 22 January 2025<br><br>
+
+        <b>Supervisor:</b> Prof. Ir. Ts. Dr. Bukhari Bin Manshoor<br>
+        <b>Supervisor:</b> Ir. Dr.-Eng. Mairiza Zainuddin
+    </div>
+</div>
+""", unsafe_allow_html=True)
 
 # ======================================================
-# STREAMLIT BUTTON (INTERACTIVE)
+# BUTTON (STREAMLIT NATIF & STABIL)
 # ======================================================
-st.markdown("<div class='hero-btn'>", unsafe_allow_html=True)
+st.markdown("<br>", unsafe_allow_html=True)
 
-if st.button("🚀 Enter Simulation Application"):
-    st.switch_page("pages/1_Fuzzy_System.py")
-
-st.markdown("</div>", unsafe_allow_html=True)
+col1, col2, col3 = st.columns([1, 2, 1])
+with col2:
+    if st.button("🚀 Enter Simulation Application", use_container_width=True):
+        st.switch_page("pages/1_Fuzzy_System.py")
