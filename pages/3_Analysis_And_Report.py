@@ -53,10 +53,21 @@ if "fuzzy_result" not in st.session_state or "dp_result" not in st.session_state
     st.warning("⚠️ Fuzzy or DP data is not available. Please run Page 1 and 2 first.")
     st.stop()
 
-df_fuzzy = st.session_state["fuzzy_result"]
-df_dp = st.session_state["dp_result"]
+df_fuzzy = st.session_state["fuzzy_result"].copy()
+df_dp = st.session_state["dp_result"].copy()
 
 st.success("✅ Fuzzy and DP data successfully loaded")
+
+# ==========================================================
+# 🔴 CRITICAL FIX (WITHOUT CHANGING FLOW)
+# STANDARDIZE COLUMN NAMES FOR KPI & VALIDATION
+# ==========================================================
+df_dp = df_dp.rename(columns={
+    "Demand": "Demand",
+    "Impor_Optimal": "Impor_Optimal",
+    "Stok_Akhir": "Stok_Akhir",
+    "Stok_Awal": "Stok_Awal"
+})
 
 # ==========================================================
 # KPI DASHBOARD
@@ -67,7 +78,7 @@ kpi = calculate_kpis(
     df_policy=df_dp,
     demand=df_dp["Demand"].values,
     import_cost=df_dp["Import_Cost"].sum() / df_dp["Impor_Optimal"].sum(),
-    holding_cost=df_dp["Holding_Cost"].sum() / df_dp["Stok_Akhir"].sum(),
+    holding_cost=df_dp["Holding_Cost"].sum() / df_dp["Stok_Akhir"].mean(),
     max_stock=df_dp["Stok_Akhir"].max()
 )
 
@@ -159,8 +170,8 @@ with col_fig2:
     errors_fuzzy = np.abs(df_dp["Demand"] - df_fuzzy["Prediksi_Impor_Fuzzy"])
     errors_dp = np.abs(df_dp["Demand"] - df_dp["Impor_Optimal"])
     x = np.arange(len(df_dp))
-    ax2.bar(x - 0.2, errors_fuzzy, 0.4, label="Fuzzy Error", color='skyblue')
-    ax2.bar(x + 0.2, errors_dp, 0.4, label="DP Error", color='salmon')
+    ax2.bar(x - 0.2, errors_fuzzy, 0.4, label="Fuzzy Error")
+    ax2.bar(x + 0.2, errors_dp, 0.4, label="DP Error")
     ax2.set_xticks(x)
     ax2.set_xticklabels(df_dp["Month"], rotation=45)
     ax2.set_title("Absolute Error Comparison")
@@ -173,7 +184,6 @@ with col_fig2:
 # ==========================================================
 st.header("⬇️ Download Reports")
 
-# Restoring the original multi-sheet structure in English
 excel_buffer = export_multi_sheet({
     "Fuzzy_Result": df_fuzzy,
     "DP_Result": df_dp,
