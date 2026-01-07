@@ -13,19 +13,18 @@ st.set_page_config(
     layout="wide"
 )
 
-st.title("⚙️ Optimasi Impor Menggunakan Dynamic Programming")
+st.title("⚙️ Import Optimization Using Dynamic Programming")
 st.markdown("""
-Halaman ini melakukan **optimasi keputusan impor** menggunakan  
-**Dynamic Programming (DP)** dengan **hasil Fuzzy sebagai pembatas aksi**.
+This page performs import decision optimization using Dynamic Programming (DP) with Fuzzy results as action constraints.
 """)
 
 # =========================================================
 # UPLOAD DATA HASIL FUZZY
 # =========================================================
-st.subheader("📂 Upload Data Hasil Fuzzy")
+st.subheader("📂 Upload Fuzzy Result")
 
 uploaded_file = st.file_uploader(
-    "Upload file Excel hasil prediksi Fuzzy",
+    "Upload file Fuzzy prediction Result",
     type=["xlsx"]
 )
 
@@ -40,12 +39,12 @@ if uploaded_file:
 
     if not all(col in df.columns for col in required_cols):
         st.error(
-            "❌ File tidak valid. Pastikan berasal dari halaman Fuzzy dan "
-            "memiliki kolom: Market_Demand, Product_Stock, Prediksi_Impor_Fuzzy"
+            "❌ File not Valid "
+ 
         )
         st.stop()
 
-    st.success("✅ Data Fuzzy berhasil dimuat")
+    st.success("✅ Data Fuzzy loaded")
     st.dataframe(df)
 
     # =====================================================
@@ -85,7 +84,7 @@ if uploaded_file:
     # =====================================================
     # RUN DP
     # =====================================================
-    if st.button("⚙️ Jalankan Optimasi DP"):
+    if st.button("⚙️ Run DP Optimation"):
         demand = df["Market_Demand"].values
         fuzzy_import = df["Prediksi_Impor_Fuzzy"].values
 
@@ -117,23 +116,23 @@ if uploaded_file:
         st.session_state["dp_result"] = results_dp.copy()
         st.session_state["dp_total_cost"] = total_cost
 
-        st.success("✅ Hasil DP dan Total Cost disimpan ke session")
+        st.success("✅ DP Result into session")
 
         # =================================================
         # HASIL DP
         # =================================================
-        st.subheader("📊 Hasil Optimasi Dynamic Programming")
+        st.subheader("📊 Dynamic Programming Optimation Result")
         st.dataframe(results_dp)
 
         st.metric(
-            label="💰 Total Biaya Minimum (Kumulatif)",
+            label="💰 Minimum Total_Cost (Kumulatif)",
             value=f"{results_dp['Total_Cost'].sum():,.2f}"
         )
 
         # =================================================
         # GRAFIK PERBANDINGAN
         # =================================================
-        st.subheader("📈 Perbandingan Impor Fuzzy vs Impor Optimal (DP)")
+        st.subheader("📈 Comparasion Fuzzy_Import vs Optimal_Import (DP)")
 
         fig, ax = plt.subplots(figsize=(10, 4))
         ax.plot(
@@ -144,14 +143,14 @@ if uploaded_file:
         )
         ax.plot(
             results_dp["Month"],
-            results_dp["Impor_Optimal"],
+            results_dp["Optimal_Import"],
             marker="s",
-            label="Impor Optimal (DP)"
+            label="Optimal Import(DP)"
         )
 
         ax.set_xlabel("Month")
-        ax.set_ylabel("Jumlah Impor")
-        ax.set_title("Perbandingan Keputusan Impor")
+        ax.set_ylabel("Total Import")
+        ax.set_title("Import Decision Comparison")
         ax.legend()
         ax.grid(True)
 
@@ -160,7 +159,7 @@ if uploaded_file:
         # =================================================
         # DOWNLOAD HASIL
         # =================================================
-        st.subheader("⬇️ Download Hasil Optimasi")
+        st.subheader("⬇️ Download Result")
 
         output = pd.ExcelWriter(
             "hasil_dp.xlsx",
@@ -177,8 +176,9 @@ if uploaded_file:
 
         with open("hasil_dp.xlsx", "rb") as f:
             st.download_button(
-                label="⬇️ Download Hasil DP (Excel)",
+                label="⬇️ Download Result (Excel)",
                 data=f,
                 file_name="hasil_dp.xlsx",
                 mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
             )
+
