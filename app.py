@@ -4,13 +4,13 @@ import streamlit as st
 # PAGE CONFIG
 # =============================
 st.set_page_config(
-    page_title="Cement Supply Chain Simulation",
+    page_title="Cement SCM Simulation",
     page_icon="🏭",
     layout="centered"
 )
 
 # =============================
-# CUSTOM CSS
+# CUSTOM CSS (MATCH IMAGE 1)
 # =============================
 st.markdown(
     """
@@ -18,60 +18,62 @@ st.markdown(
     body {
         background-color: #0b1c2d;
     }
-    .main {
-        background: linear-gradient(180deg, #0b1c2d 0%, #102a43 100%);
-        padding: 30px;
-        border-radius: 12px;
+
+    .block-container {
+        padding-top: 40px;
     }
+
     .title {
         text-align: center;
         font-size: 26px;
         font-weight: 700;
-        color: white;
-        margin-bottom: 10px;
+        color: #ffffff;
+        line-height: 1.4;
+        margin-bottom: 15px;
     }
+
     .subtitle {
         text-align: center;
-        font-size: 15px;
+        font-size: 14px;
         color: #cbd5e1;
-        margin-bottom: 20px;
+        margin-bottom: 25px;
     }
+
     .author {
         text-align: center;
         font-size: 18px;
         font-weight: 600;
-        color: white;
-        margin: 15px 0;
+        color: #ffffff;
+        margin: 20px 0;
     }
+
     .section {
         text-align: center;
         font-size: 14px;
         color: #e2e8f0;
-        margin-top: 10px;
+        margin-bottom: 6px;
     }
-    .button-container {
+
+    .button-area {
         display: flex;
         justify-content: center;
-        margin-top: 25px;
-        margin-bottom: 30px;
+        margin: 30px 0 40px 0;
     }
-    .declaration-box {
+
+    .declaration {
         background-color: #0f2a44;
-        padding: 20px;
-        border-radius: 10px;
-        margin-top: 30px;
+        padding: 22px;
+        border-radius: 12px;
         color: #e5e7eb;
         font-size: 13px;
+        margin-top: 30px;
     }
+
     .declaration-title {
         text-align: center;
         font-weight: 600;
-        margin-bottom: 10px;
-        color: white;
-    }
-    .footer {
-        font-size: 12px;
-        margin-top: 15px;
+        color: #ffffff;
+        margin-bottom: 12px;
     }
     </style>
     """,
@@ -79,14 +81,13 @@ st.markdown(
 )
 
 # =============================
-# MAIN CONTENT
+# MAIN TITLE
 # =============================
-st.markdown("<div class='main'>", unsafe_allow_html=True)
-
 st.markdown(
     """
     <div class="title">
-    DYNAMIC SYSTEM MODEL TO IMPROVE THE RATIO AND EFFICIENCY IN THE SUPPLY CHAIN MANAGEMENT (SCM) DISTRIBUTION OF THE CEMENT INDUSTRY
+    DYNAMIC SYSTEM MODEL TO IMPROVE THE RATIO AND EFFICIENCY IN THE SUPPLY CHAIN
+    MANAGEMENT (SCM) DISTRIBUTION OF THE CEMENT INDUSTRY
     </div>
     """,
     unsafe_allow_html=True
@@ -101,6 +102,9 @@ st.markdown(
     unsafe_allow_html=True
 )
 
+# =============================
+# AUTHOR
+# =============================
 st.markdown(
     """
     <div class="author">
@@ -110,10 +114,15 @@ st.markdown(
     unsafe_allow_html=True
 )
 
+# =============================
+# THESIS INFO
+# =============================
 st.markdown(
     """
     <div class="section">
-    A thesis submitted in fulfilment of the requirement for the award of the<br>
+    A thesis submitted in fulfilment of the requirement for the award of the
+    </div>
+    <div class="section">
     <b>Doctor of Philosophy in Mechanical Engineering</b>
     </div>
     """,
@@ -123,7 +132,9 @@ st.markdown(
 st.markdown(
     """
     <div class="section">
-    Faculty of Mechanical and Manufacturing Engineering<br>
+    Faculty of Mechanical and Manufacturing Engineering
+    </div>
+    <div class="section">
     Universiti Tun Hussein Onn Malaysia
     </div>
     """,
@@ -142,7 +153,7 @@ st.markdown(
 # =============================
 # BUTTON
 # =============================
-st.markdown("<div class='button-container'>", unsafe_allow_html=True)
+st.markdown("<div class='button-area'>", unsafe_allow_html=True)
 if st.button("🚀 Enter Simulation Application"):
     st.session_state["page"] = "simulation"
 st.markdown("</div>", unsafe_allow_html=True)
@@ -152,21 +163,22 @@ st.markdown("</div>", unsafe_allow_html=True)
 # =============================
 st.markdown(
     """
-    <div class="declaration-box">
+    <div class="declaration">
         <div class="declaration-title">STUDENT DECLARATION</div>
         <p>
-        “I hereby declare that the work in this thesis is my own except for quotations and summaries which have been duly acknowledged.”
+        “I hereby declare that the work in this thesis is my own except for quotations
+        and summaries which have been duly acknowledged.”
         </p>
-        <div class="footer">
+        <p>
         <b>Student:</b> Yudi Maulana<br>
-        <b>Date:</b> 22 January 2025<br><br>
+        <b>Date:</b> 22 January 2025
+        </p>
+        <p>
         <b>Supervisor:</b> Prof. Ir. Ts. Dr. Bukhari Bin Manshoor<br>
         <b>Supervisor:</b> Ir. Dr.-Eng. Mairiza Zainuddin
-        </div>
+        </p>
     </div>
     """,
     unsafe_allow_html=True
 )
-
-st.markdown("</div>", unsafe_allow_html=True)
 
