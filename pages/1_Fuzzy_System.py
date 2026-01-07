@@ -9,9 +9,13 @@ from modules.visualization import plot_mf, plot_fuzzy_surface
 from io import BytesIO
 
 # =========================================================
-# CONFIGURATION
+# PAGE CONFIGURATION
 # =========================================================
-st.set_page_config(page_title="Fuzzy Import System", layout="wide")
+st.set_page_config(
+    page_title="Fuzzy Import System",
+    layout="wide"
+)
+
 st.title("📊 Import Requirement Forecasting Using a Fuzzy System")
 
 # =========================================================
@@ -20,14 +24,14 @@ st.title("📊 Import Requirement Forecasting Using a Fuzzy System")
 system, md, ps, pc, pi = build_fuzzy_system()
 
 # =========================================================
-# MEMBERSHIP FUNCTIONS (WITH TOGGLE BUTTON)
+# MEMBERSHIP FUNCTIONS (TOGGLE)
 # =========================================================
 st.subheader("📐 Membership Functions")
 
-if 'show_mf' not in st.session_state:
+if "show_mf" not in st.session_state:
     st.session_state.show_mf = False
 
-if st.button("📐 Show"):
+if st.button("📐 Show Membership Functions"):
     st.session_state.show_mf = not st.session_state.show_mf
 
 if st.session_state.show_mf:
@@ -45,7 +49,7 @@ if st.session_state.show_mf:
             plot_mf(
                 ps.universe,
                 {k: ps[k].mf for k in ps.terms},
-                "Product Stock"
+                "Initial Stock"
             )
         )
 
@@ -61,19 +65,19 @@ if st.session_state.show_mf:
             plot_mf(
                 pi.universe,
                 {k: pi[k].mf for k in pi.terms},
-                "Product Import"
+                "Import Decision"
             )
         )
 
 # =========================================================
-# FUZZY SURFACE (3D VISUALIZATION)
+# FUZZY SURFACE (3D)
 # =========================================================
 st.subheader("🧩 Fuzzy Surface (3D Visualization)")
 
-if 'show_surface' not in st.session_state:
+if "show_surface" not in st.session_state:
     st.session_state.show_surface = False
 
-if st.button("🧩 Show"):
+if st.button("🧩 Show Fuzzy Surface"):
     st.session_state.show_surface = not st.session_state.show_surface
 
 if st.session_state.show_surface:
@@ -93,6 +97,7 @@ if st.session_state.show_surface:
 # DATA UPLOAD
 # =========================================================
 st.subheader("📂 Upload AnyLogic Data")
+
 uploaded_file = st.file_uploader(
     "Upload CSV or Excel File",
     type=["csv", "xlsx"]
@@ -101,21 +106,37 @@ uploaded_file = st.file_uploader(
 if uploaded_file:
     df = load_anylogic_data(uploaded_file)
 
-    # ===== MONTHLY TIME SERIES HANDLING =====
-    df['Month'] = pd.to_datetime(df['Month']).dt.to_period('M')
-
-    # ===== STANDARDIZE COLUMN NAMES =====
-    df = df.rename(columns={
-        'Demand': 'Market_Demand',
-        'Stock': 'Product_Stock',
-        'Production': 'Production_Capacity'
-    })
-
-    st.success("✅ Data Successfully Uploaded")
-    st.dataframe(df)
+    # =====================================================
+    # STANDARDIZE TIME COLUMN
+    # =====================================================
+    df["Month"] = pd.to_datetime(df["Month"]).dt.to_period("M")
 
     # =====================================================
-    # FUZZY PREDICTION
+    # STANDARDIZE COLUMN NAMES (GLOBAL CONTRACT)
+    # =====================================================
+    df = df.rename(columns={
+        "Demand": "Demand",
+        "Stock": "Initial_Stock",
+        "Production": "Production_Capacity"
+    })
+
+    required_cols = [
+        "Month",
+        "Demand",
+        "Initial_Stock",
+        "Production_Capacity"
+    ]
+
+    if not all(col in df.columns for col in required_cols):
+        st.error("❌ Required columns are missing.")
+        st.write("Detected columns:", list(df.columns))
+        st.stop()
+
+    st.success("✅ Data successfully uploaded and validated")
+    st.dataframe(df, use_container_width=True)
+
+    # =====================================================
+    # RUN FUZZY PREDICTION
     # =====================================================
     if st.button("🔍 Run Fuzzy Prediction"):
         predictions = []
@@ -123,60 +144,64 @@ if uploaded_file:
         for _, row in df.iterrows():
             pred = predict_import(
                 system,
-                row['Market_Demand'],
-                row['Product_Stock'],
-                row['Production_Capacity']
+                row["Demand"],
+                row["Initial_Stock"],
+                row["Production_Capacity"]
             )
             predictions.append(pred)
 
-        df['Fuzzy_Import_Prediction'] = predictions
-
-        st.session_state["fuzzy_result"] = df.copy()
-
-        st.success("✅ Prediction Results Saved to Session")
-        st.dataframe(df)
+        df["Fuzzy_Import"] = predictions
 
         # =================================================
-        # RESULTS
+        # SAVE ONLY STANDARDIZED OUTPUT TO SESSION
         # =================================================
-        st.subheader("📈 Import Prediction Results (Fuzzy System)")
-        st.dataframe(df)
+        fuzzy_output = df[[
+            "Month",
+            "Demand",
+            "Initial_Stock",
+            "Fuzzy_Import"
+        ]].copy()
+
+        st.session_state["fuzzy_result"] = fuzzy_output
+
+        st.success("✅ Fuzzy prediction results saved to session")
+        st.dataframe(fuzzy_output, use_container_width=True)
 
         # =================================================
-        # TIME SERIES PLOT
+        # TIME SERIES VISUALIZATION
         # =================================================
-        st.subheader("📉 Time Series of Import Prediction")
+        st.subheader("📉 Time Series of Fuzzy Import Prediction")
 
         fig, ax = plt.subplots(figsize=(10, 4))
         ax.plot(
-            df['Month'].astype(str),
-            df['Fuzzy_Import_Prediction'],
-            marker='o'
+            fuzzy_output["Month"].astype(str),
+            fuzzy_output["Fuzzy_Import"],
+            marker="o"
         )
         ax.set_xlabel("Month")
-        ax.set_ylabel("Import Volume")
-        ax.set_title("Time Series of Fuzzy Import Prediction")
+        ax.set_ylabel("Import Quantity")
+        ax.set_title("Fuzzy Import Prediction Over Time")
         ax.grid(True)
         plt.xticks(rotation=45)
 
         st.pyplot(fig)
 
         # =================================================
-        # DOWNLOAD EXCEL
+        # DOWNLOAD RESULTS
         # =================================================
         output = BytesIO()
-        with pd.ExcelWriter(output, engine='openpyxl') as writer:
-            df.to_excel(
+        with pd.ExcelWriter(output, engine="openpyxl") as writer:
+            fuzzy_output.to_excel(
                 writer,
                 index=False,
-                sheet_name='Fuzzy_Results'
+                sheet_name="Fuzzy_Result"
             )
 
         output.seek(0)
 
         st.download_button(
-            label="⬇️ Download Results (Excel)",
+            label="⬇️ Download Fuzzy Results (Excel)",
             data=output,
-            file_name="fuzzy_import_predictions.xlsx",
+            file_name="fuzzy_import_results.xlsx",
             mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
         )
