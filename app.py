@@ -124,14 +124,14 @@ st.markdown("""
         <b>Doctor of Philosophy in Mechanical Engineering</b><br><br>
         Faculty of Mechanical and Manufacturing Engineering<br>
         Universiti Tun Hussein Onn Malaysia<br><br>
-        January 2025
+        January 2026
     </div>
     <div class="declaration">
         <div class="declaration-title">STUDENT DECLARATION</div>
             “I hereby declare that the work in this thesis is my own except for quotations
             and summaries which have been duly acknowledged.”<br><br>
             <b>Student:</b> Yudi Maulana<br>
-            <b>Date:</b> 22 January 2025<br><br>
+            <b>Date:</b> 22 January 2026<br><br>
             <b>Supervisor:</b> Prof. Ir. Ts. Dr. Bukhari Bin Manshoor<br>
             <b>Supervisor:</b> Ir. Dr.-Eng. Mairiza Zainuddin<br>
         </div>
@@ -148,4 +148,5 @@ col1, col2, col3 = st.columns([1, 2, 1])
 with col2:
     if st.button("🚀 Run Simulation ", use_container_width=True):
         st.switch_page("pages/1_Fuzzy_System.py")
+
 
