@@ -116,17 +116,12 @@ st.markdown("""
     <div class="hero-subtitle">
         AT BANTEN PROVINCE, INDONESIA
     </div>
+    <div class="author">
+        YUDI MAULANA
+    </div>
 </div>
 """, unsafe_allow_html=True)
 
-# =============================
-# AUTHOR
-# =============================
-st.markdown("""
-<div class="author">
-YUDI MAULANA
-</div>
-""", unsafe_allow_html=True)
 
 # =============================
 # INFO
@@ -167,3 +162,4 @@ st.markdown("""
     <b>Supervisor:</b> Ir. Dr.-Eng. Mairiza Zainuddin
 </div>
 """, unsafe_allow_html=True)
+
