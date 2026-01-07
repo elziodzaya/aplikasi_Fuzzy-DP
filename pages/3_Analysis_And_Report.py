@@ -7,42 +7,50 @@ from scipy.stats import f_oneway
 # Import modul internal Anda
 from modules.export_excel import export_multi_sheet
 from modules.export_pdf import export_summary_pdf
-from modules.kpi_metrics import calculate_kpis, validation_summary
+from modules.kpi_metrics import (
+    calculate_kpis,
+    validation_summary
+)
 from modules.kpi_visuals import show_kpi_metrics, plot_inventory_profile
 
 # ==========================================================
-# 1. CONFIG & STYLING
+# 1. CONFIG & ADVANCED STYLING (Kunci Tampilan Card)
 # ==========================================================
 st.set_page_config(
-    page_title="Analisis & Validasi",
+    page_title="Validasi & Analisis",
     page_icon="📊",
     layout="wide"
 )
 
-# Custom CSS untuk membuat tampilan "Card" pada Metric
+# CSS ini akan memaksa fungsi show_kpi_metrics() Anda tampil bergaya Card
 st.markdown("""
     <style>
-    /* Mengatur style kartu untuk metric */
+    /* Mengubah container metric menjadi Card */
     div[data-testid="stMetric"] {
         background-color: #ffffff;
         border: 1px solid #e0e0e0;
         padding: 15px 20px;
-        border-radius: 10px;
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        border-radius: 12px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+        transition: transform 0.2s;
     }
-    /* Memberikan warna khusus pada label metric */
+    div[data-testid="stMetric"]:hover {
+        transform: translateY(-5px);
+        border-color: #2e7d32;
+    }
+    /* Mempercantik label dan nilai */
     label[data-testid="stMetricLabel"] {
-        font-weight: bold;
-        color: #555;
+        font-weight: 700;
+        color: #444;
+        font-size: 16px;
     }
-    /* Mempercantik header tab */
-    .stTabs [data-baseweb="tab-list"] {
-        gap: 24px;
+    div[data-testid="stMetricValue"] {
+        font-size: 24px;
+        color: #1f77b4;
     }
-    .stTabs [data-baseweb="tab"] {
-        height: 50px;
-        white-space: pre-wrap;
-        font-weight: bold;
+    /* Meratakan kolom agar lebih rapi */
+    [data-testid="column"] {
+        padding: 10px;
     }
     </style>
     """, unsafe_allow_html=True)
@@ -51,80 +59,77 @@ st.markdown("""
 # 2. HEADER
 # ==========================================================
 st.title("📊 Analisis dan Validasi")
-st.markdown("""
-Halaman ini menyajikan **analisis hasil sistem fuzzy dan dynamic programming (DP)**, 
-visualisasi perbandingan, serta validasi statistik untuk mendukung pengambilan keputusan.
-""")
-st.divider()
+st.markdown("Dashboard hasil integrasi sistem **Fuzzy Logic** dan **Dynamic Programming**.")
 
 # ==========================================================
-# 3. LOAD DATA
+# 3. LOAD DATA DARI SESSION STATE
 # ==========================================================
 if "fuzzy_result" not in st.session_state or "dp_result" not in st.session_state:
-    st.error("🚨 **Data Tidak Ditemukan!** Silakan jalankan simulasi di halaman 1 (Fuzzy) dan halaman 2 (DP) terlebih dahulu.")
+    st.warning("⚠️ Data fuzzy atau DP belum tersedia. Silakan jalankan halaman sebelumnya.")
     st.stop()
 
 df_fuzzy = st.session_state["fuzzy_result"]
 df_dp = st.session_state["dp_result"]
 
 # ==========================================================
-# 4. KPI DASHBOARD (CARD SECTION)
+# 4. KPI DASHBOARD (Tampilan Card Otomatis)
 # ==========================================================
-st.subheader("📌 Key Performance Indicators (KPI)")
+st.header("📊 KPI Kinerja Sistem")
 
-# Hitung data untuk KPI
-total_fuzzy_import = df_fuzzy["Prediksi_Impor_Fuzzy"].sum()
-total_dp_import = df_dp["Impor_Optimal"].sum()
-total_cost = df_dp["Total_Cost"].sum()
-avg_demand = df_dp["Demand"].mean()
+# Kalkulasi KPI sesuai fungsi asli Anda
+kpi = calculate_kpis(
+    df_policy=df_dp,
+    demand=df_dp["Demand"].values,
+    import_cost=df_dp["Import_Cost"].sum() / df_dp["Impor_Optimal"].sum(),
+    holding_cost=df_dp["Holding_Cost"].sum() / df_dp["Stok_Akhir"].sum(),
+    max_stock=df_dp["Stok_Akhir"].max()
+)
 
-# Tampilkan dalam 4 kolom kartu
-k1, k2, k3, k4 = st.columns(4)
+# Menampilkan KPI menggunakan fungsi asli Anda
+# CSS di atas akan otomatis membungkus output fungsi ini menjadi Card
+show_kpi_metrics(kpi)
 
-with k1:
-    st.metric("Total Impor (Fuzzy)", f"{int(total_fuzzy_import):,}")
-with k2:
-    st.metric("Total Impor (DP)", f"{int(total_dp_import):,}", 
-              delta=f"{int(total_dp_import - total_fuzzy_import):,} diff")
-with k3:
-    st.metric("Total Biaya Sistem", f"Rp {int(total_cost):,}")
-with k4:
-    st.metric("Rata-rata Demand", f"{int(avg_demand):,}")
-
-st.markdown("<br>", unsafe_allow_html=True)
+# Menampilkan grafik profil inventori
+st.markdown("---")
+plot_inventory_profile(df_dp)
 
 # ==========================================================
-# 5. VISUALISASI UTAMA
-# ==========================================================
-col_graph1, col_graph2 = st.columns(2)
-
-with col_graph1:
-    st.subheader("📈 Profil Inventori")
-    # Memanggil fungsi plot dari modul kpi_visuals
-    plot_inventory_profile(df_dp)
-
-with col_graph2:
-    st.subheader("📈 Perbandingan Impor")
-    fig, ax = plt.subplots(figsize=(10, 6))
-    ax.plot(df_fuzzy["Month"].astype(str), df_fuzzy["Prediksi_Impor_Fuzzy"], 
-            marker="o", label="Impor Fuzzy", color="#1f77b4", linewidth=2)
-    ax.plot(df_dp["Month"], df_dp["Impor_Optimal"], 
-            marker="s", label="Impor DP", color="#ff7f0e", linewidth=2)
-    ax.set_xlabel("Bulan")
-    ax.set_ylabel("Jumlah Unit")
-    ax.legend()
-    ax.grid(True, alpha=0.3)
-    st.pyplot(fig)
-
-# ==========================================================
-# 6. ANALISIS DETAIL & STATISTIK (TABS)
+# 5. VALIDASI & STATISTIK (DIBUAT BERKOLOM)
 # ==========================================================
 st.divider()
-st.subheader("🧪 Detail Analisis & Validasi")
+col_val, col_anova = st.columns([2, 1])
 
-tab_data, tab_stat, tab_error = st.tabs(["📄 Tabel Analisis", "🔬 Uji Statistik", "📊 Analisis Error"])
+with col_val:
+    st.subheader("🔍 Validasi Prediksi & DM Test")
+    df_validation = validation_summary(
+        actual=df_dp["Demand"].values,
+        fuzzy=df_fuzzy["Prediksi_Impor_Fuzzy"].values,
+        baseline=df_dp["Impor_Optimal"].values
+    )
+    st.dataframe(df_validation, use_container_width=True)
 
-with tab_data:
+with col_anova:
+    st.subheader("🔬 Uji ANOVA")
+    anova_stat, anova_p = f_oneway(
+        df_fuzzy["Prediksi_Impor_Fuzzy"].values,
+        df_dp["Impor_Optimal"].values,
+        df_dp["Demand"].values
+    )
+    
+    is_significant = anova_p < 0.05
+    st.info(f"**F-Stat:** `{anova_stat:.4f}`")
+    if is_significant:
+        st.error(f"**P-Value:** `{anova_p:.4f}`\n\n(Signifikan)")
+    else:
+        st.success(f"**P-Value:** `{anova_p:.4f}`\n\n(Tidak Signifikan)")
+
+# ==========================================================
+# 6. ANALISIS BULANAN & VISUALISASI
+# ==========================================================
+st.divider()
+tab1, tab2 = st.tabs(["📋 Data Bulanan", "📈 Grafik Perbandingan"])
+
+with tab1:
     df_analysis = pd.DataFrame({
         "Bulan": df_fuzzy["Month"].astype(str),
         "Demand": df_dp["Demand"],
@@ -136,87 +141,25 @@ with tab_data:
     })
     st.dataframe(df_analysis, use_container_width=True)
 
-with tab_stat:
-    col_a, col_b = st.columns([1, 2])
-    
-    # Hitung ANOVA
-    anova_stat, anova_p = f_oneway(
-        df_fuzzy["Prediksi_Impor_Fuzzy"].values,
-        df_dp["Impor_Optimal"].values,
-        df_dp["Demand"].values
-    )
-    
-    with col_a:
-        st.write("**Hasil Uji ANOVA**")
-        st.write(f"- F-Statistic: `{anova_stat:.4f}`")
-        st.write(f"- P-Value: `{anova_p:.4f}`")
-        if anova_p < 0.05:
-            st.error("Signifikan (Ada perbedaan nyata)")
-        else:
-            st.success("Tidak Signifikan (Data selaras)")
-            
-    with col_b:
-        st.write("**DM Test & Summary**")
-        df_validation = validation_summary(
-            actual=df_dp["Demand"].values,
-            fuzzy=df_fuzzy["Prediksi_Impor_Fuzzy"].values,
-            baseline=df_dp["Impor_Optimal"].values
-        )
-        st.dataframe(df_validation, use_container_width=True)
-
-with tab_error:
-    st.write("**Perbandingan Error Absolut (Fuzzy vs DP)**")
-    errors_fuzzy = np.abs(df_dp["Demand"] - df_fuzzy["Prediksi_Impor_Fuzzy"])
-    errors_dp = np.abs(df_dp["Demand"] - df_dp["Impor_Optimal"])
-    
-    fig_err, ax_err = plt.subplots(figsize=(10, 4))
-    x = np.arange(len(df_dp))
-    ax_err.bar(x - 0.2, errors_fuzzy, 0.4, label="Error Fuzzy", color='#a6cee3')
-    ax_err.bar(x + 0.2, errors_dp, 0.4, label="Error DP", color='#fb9a99')
-    ax_err.set_xticks(x)
-    ax_err.set_xticklabels(df_dp["Month"], rotation=45)
-    ax_err.legend()
-    st.pyplot(fig_err)
+with tab2:
+    fig, ax = plt.subplots(figsize=(10, 4))
+    ax.plot(df_analysis["Bulan"], df_analysis["Impor (Fuzzy)"], marker="o", label="Fuzzy")
+    ax.plot(df_analysis["Bulan"], df_analysis["Impor (DP)"], marker="s", label="DP Optimal")
+    ax.set_title("Fuzzy vs Dynamic Programming")
+    ax.legend()
+    st.pyplot(fig)
 
 # ==========================================================
 # 7. DOWNLOAD LAPORAN
 # ==========================================================
 st.divider()
-st.subheader("⬇️ Unduh Laporan Resmi")
+st.subheader("⬇️ Unduh Laporan")
+c1, c2, _ = st.columns([1, 1, 2])
 
-d1, d2, _ = st.columns([1, 1, 2])
+with c1:
+    excel_buf = export_multi_sheet({"Analysis": df_analysis, "Validation": df_validation})
+    st.download_button("📂 Download Excel", data=excel_buf, file_name="Laporan.xlsx", use_container_width=True)
 
-with d1:
-    excel_buffer = export_multi_sheet({
-        "Fuzzy_Result": df_fuzzy,
-        "DP_Result": df_dp,
-        "Final_Analysis": df_analysis,
-        "Validation": df_validation
-    })
-    st.download_button(
-        label="📥 Download Excel",
-        data=excel_buffer,
-        file_name="Laporan_Fuzzy_DP.xlsx",
-        mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-        use_container_width=True
-    )
-
-with d2:
-    pdf_buffer = export_summary_pdf(
-        title="Laporan Akhir Sistem Pendukung Keputusan",
-        metrics={
-            "Total Impor Fuzzy": f"{int(total_fuzzy_import):,}",
-            "Total Impor DP": f"{int(total_dp_import):,}",
-            "Total Biaya": f"Rp {int(total_cost):,}"
-        },
-        conclusion="Sistem berhasil mengoptimalkan stok dan biaya impor."
-    )
-    st.download_button(
-        label="📥 Download PDF",
-        data=pdf_buffer,
-        file_name="Laporan_Fuzzy_DP.pdf",
-        mime="application/pdf",
-        use_container_width=True
-    )
-
-st.success("✅ Dashboard siap digunakan.")
+with c2:
+    pdf_buf = export_summary_pdf(title="Laporan Akhir", metrics={"Total Cost": df_dp["Total_Cost"].sum()}, conclusion="Selesai.")
+    st.download_button("📄 Download PDF", data=pdf_buf, file_name="Laporan.pdf", use_container_width=True)
