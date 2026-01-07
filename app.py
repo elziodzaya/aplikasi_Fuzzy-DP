@@ -139,14 +139,6 @@ st.markdown("""
 </div>
 """, unsafe_allow_html=True)
 
-
-# =============================
-# INFO
-# =============================
-st.markdown("""
-
-""", unsafe_allow_html=True)
-
 # =============================
 # BUTTON
 # =============================
@@ -157,12 +149,7 @@ st.markdown("</div>", unsafe_allow_html=True)
 
 st.markdown("<div class='divider'></div>", unsafe_allow_html=True)
 
-# =============================
-# DECLARATION
-# =============================
-st.markdown("""
 
-""", unsafe_allow_html=True)
 
 
 
