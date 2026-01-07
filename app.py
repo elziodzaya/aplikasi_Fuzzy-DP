@@ -126,6 +126,18 @@ st.markdown("""
         Universiti Tun Hussein Onn Malaysia<br><br>
         January 2025
     </div>
+    <div class="declaration">
+        <div class="declaration-title">STUDENT DECLARATION</div>
+        “I hereby declare that the work in this thesis is my own except for quotations
+        and summaries which have been duly acknowledged.”<br><br>
+    
+        <b>Student:</b> Yudi Maulana<br>
+        <b>Date:</b> 22 January 2025<br><br>
+    
+        <b>Supervisor:</b> Prof. Ir. Ts. Dr. Bukhari Bin Manshoor<br>
+        <b>Supervisor:</b> Ir. Dr.-Eng. Mairiza Zainuddin
+        </div>
+    </div>
 </div>
 """, unsafe_allow_html=True)
 
@@ -151,17 +163,8 @@ st.markdown("<div class='divider'></div>", unsafe_allow_html=True)
 # DECLARATION
 # =============================
 st.markdown("""
-<div class="declaration">
-    <div class="declaration-title">STUDENT DECLARATION</div>
-    “I hereby declare that the work in this thesis is my own except for quotations
-    and summaries which have been duly acknowledged.”<br><br>
 
-    <b>Student:</b> Yudi Maulana<br>
-    <b>Date:</b> 22 January 2025<br><br>
-
-    <b>Supervisor:</b> Prof. Ir. Ts. Dr. Bukhari Bin Manshoor<br>
-    <b>Supervisor:</b> Ir. Dr.-Eng. Mairiza Zainuddin
-</div>
 """, unsafe_allow_html=True)
+
 
 
