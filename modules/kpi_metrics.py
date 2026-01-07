@@ -2,9 +2,9 @@ import numpy as np
 import pandas as pd
 from scipy.stats import norm
 
-# =========================
-# ERROR METRICS (FUZZY)
-# =========================
+# ======================================================
+# ERROR METRICS (FUZZY PREDICTION)
+# ======================================================
 
 def mae(y_true, y_pred):
     return np.mean(np.abs(y_true - y_pred))
@@ -25,9 +25,9 @@ def smape(y_true, y_pred):
     return np.mean(np.abs(y_true - y_pred) / denom) * 100
 
 
-# =========================
+# ======================================================
 # DIEBOLD–MARIANO TEST
-# =========================
+# ======================================================
 
 def diebold_mariano(actual, pred_fuzzy, pred_baseline):
     e1 = actual - pred_fuzzy
@@ -40,9 +40,9 @@ def diebold_mariano(actual, pred_fuzzy, pred_baseline):
     return dm_stat, p_value
 
 
-# =========================
+# ======================================================
 # VALIDATION SUMMARY
-# =========================
+# ======================================================
 
 def validation_summary(actual, fuzzy, baseline=None):
     summary = {
@@ -67,31 +67,41 @@ def validation_summary(actual, fuzzy, baseline=None):
     return pd.DataFrame([summary])
 
 
-# =========================
-# KPI DYNAMIC PROGRAMMING
-# =========================
+# ======================================================
+# KPI – DYNAMIC PROGRAMMING (FIXED VERSION)
+# ======================================================
 
 def calculate_kpis(
-    df_policy,
-    demand,
-    import_cost,
-    holding_cost,
-    max_stock
+    df_policy: pd.DataFrame,
+    demand: np.ndarray,
+    import_cost: float,
+    holding_cost: float,
+    max_stock: float
 ):
-    total_import = df_policy["Impor_Optimal"].sum()
+    """
+    Calculate key performance indicators for Dynamic Programming policy
+    """
+
+    # ---- Total Import & Cost ----
+    total_import = df_policy["Optimal_Import"].sum()
+    total_import_cost = df_policy["Import_Cost"].sum()
     total_holding_cost = df_policy["Holding_Cost"].sum()
-    total_cost = total_import * import_cost + total_holding_cost
+    total_cost = total_import_cost + total_holding_cost
 
-    avg_inventory = df_policy["Stok_Akhir"].mean()
+    # ---- Inventory Metrics ----
+    avg_inventory = df_policy["Ending_Stock"].mean()
+    stockout_rate = (df_policy["Ending_Stock"] <= 0).mean()
+    overstock_rate = (df_policy["Ending_Stock"] >= 0.9 * max_stock).mean()
 
-    stockout_rate = (df_policy["Stok_Akhir"] <= 0).mean()
-    overstock_rate = (df_policy["Stok_Akhir"] >= 0.9 * max_stock).mean()
-
+    # ---- Demand & Service ----
     total_demand = np.sum(demand)
     service_level = 1 - stockout_rate
 
+    # ---- Efficiency Metrics ----
     cost_per_unit = total_cost / total_demand if total_demand > 0 else 0
-    inventory_turnover = total_demand / avg_inventory if avg_inventory > 0 else 0
+    inventory_turnover = (
+        total_demand / avg_inventory if avg_inventory > 0 else 0
+    )
 
     return {
         "Total Import": total_import,
