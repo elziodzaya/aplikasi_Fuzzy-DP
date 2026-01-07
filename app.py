@@ -1,93 +1,107 @@
 import streamlit as st
 
-# ======================================================
+# =============================
 # PAGE CONFIG
-# ======================================================
+# =============================
 st.set_page_config(
     page_title="Cement SCM Simulation",
     page_icon="🏭",
     layout="centered"
 )
 
-# ======================================================
-# GLOBAL STYLE (AMAN)
-# ======================================================
+# =============================
+# CSS STYLE
+# =============================
 st.markdown("""
 <style>
 body {
-    background-color: #0b2239;
+    background: linear-gradient(180deg, #081826 0%, #0b2239 100%);
     color: #e5e7eb;
 }
 
+/* main width */
 .block-container {
+    padding-top: 40px;
     max-width: 900px;
-    padding-top: 50px;
 }
 
-.card {
+/* HERO TITLE CARD */
+.hero {
     background: linear-gradient(180deg, #102a43, #0b2239);
     border-left: 6px solid #3b82f6;
-    padding: 36px;
+    padding: 36px 32px;
     border-radius: 16px;
-    box-shadow: 0 15px 40px rgba(0,0,0,0.45);
+    box-shadow: 0 12px 35px rgba(0,0,0,0.45);
+    margin-bottom: 30px;
 }
 
-.title {
+.hero-title {
     text-align: center;
     font-size: 30px;
     font-weight: 800;
-    line-height: 1.4;
-    color: white;
+    line-height: 1.45;
+    color: #ffffff;
+    letter-spacing: 0.4px;
 }
 
-.subtitle {
+.hero-subtitle {
     text-align: center;
-    margin-top: 12px;
     font-size: 15px;
     color: #cbd5e1;
+    margin-top: 14px;
 }
 
+/* author */
 .author {
     text-align: center;
-    margin: 26px 0;
     font-size: 18px;
     font-weight: 600;
+    margin: 25px 0 30px 0;
+    color: #f8fafc;
 }
 
-.section {
-    background-color: #0f2a44;
-    padding: 22px;
+/* info card */
+.info {
+    background: #0f2a44;
+    padding: 26px;
     border-radius: 14px;
-    margin-bottom: 20px;
-    font-size: 14px;
     text-align: center;
+    font-size: 14px;
+    color: #e2e8f0;
+    box-shadow: 0 10px 28px rgba(0,0,0,0.35);
+    margin-bottom: 25px;
 }
 
+/* declaration */
 .declaration {
-    background-color: #081a2c;
-    padding: 22px;
+    background: #081a2c;
+    padding: 26px;
     border-radius: 14px;
     font-size: 13px;
+    color: #e5e7eb;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.4);
 }
 
-.declaration h4 {
+.declaration-title {
     text-align: center;
-    margin-bottom: 12px;
+    font-weight: 600;
+    margin-bottom: 14px;
+    color: #ffffff;
 }
 </style>
 """, unsafe_allow_html=True)
 
-# ======================================================
-# MAIN CARD
-# ======================================================
+# =============================
+# HERO CONTENT
+# =============================
 st.markdown("""
-<div class="card">
-    <div class="title">
+<div class="hero">
+    <div class="hero-title">
         DYNAMIC SYSTEM MODEL TO IMPROVE THE RATIO AND EFFICIENCY IN THE SUPPLY CHAIN
         MANAGEMENT (SCM) DISTRIBUTION OF THE CEMENT INDUSTRY
     </div>
 
-    <div class="subtitle">
+    <div class="hero-subtitle">
         AT BANTEN PROVINCE, INDONESIA
     </div>
 
@@ -95,7 +109,7 @@ st.markdown("""
         YUDI MAULANA
     </div>
 
-    <div class="section">
+    <div class="info">
         A thesis submitted in fulfilment of the requirement for the award of the<br><br>
         <b>Doctor of Philosophy in Mechanical Engineering</b><br><br>
         Faculty of Mechanical and Manufacturing Engineering<br>
@@ -104,7 +118,7 @@ st.markdown("""
     </div>
 
     <div class="declaration">
-        <h4>STUDENT DECLARATION</h4>
+        <div class="declaration-title">STUDENT DECLARATION</div>
         “I hereby declare that the work in this thesis is my own except for quotations
         and summaries which have been duly acknowledged.”<br><br>
 
@@ -117,9 +131,9 @@ st.markdown("""
 </div>
 """, unsafe_allow_html=True)
 
-# ======================================================
-# BUTTON (STREAMLIT NATIF & STABIL)
-# ======================================================
+# =============================
+# ENTER APPLICATION BUTTON
+# =============================
 st.markdown("<br>", unsafe_allow_html=True)
 
 col1, col2, col3 = st.columns([1, 2, 1])
