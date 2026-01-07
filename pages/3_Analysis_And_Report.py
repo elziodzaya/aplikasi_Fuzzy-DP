@@ -41,6 +41,51 @@ df_dp = st.session_state["dp_result"]
 st.success("✅ Data fuzzy dan DP berhasil dimuat")
 
 # ==========================================================
+# KPI DASHBOARD
+# ==========================================================
+st.header("📊 KPI Kinerja Sistem")
+
+kpi = calculate_kpis(
+    df_policy=df_dp,
+    demand=df_dp["Demand"].values,
+    import_cost=df_dp["Import_Cost"].sum() / df_dp["Impor_Optimal"].sum(),
+    holding_cost=df_dp["Holding_Cost"].sum() / df_dp["Stok_Akhir"].sum(),
+    max_stock=df_dp["Stok_Akhir"].max()
+)
+
+show_kpi_metrics(kpi)
+plot_inventory_profile(df_dp)
+
+# ==========================================================
+# VALIDASI FUZZY + DIEBOLD–MARIANO
+# ==========================================================
+st.header("📊 Validasi Prediksi Fuzzy & DM Test")
+
+df_validation = validation_summary(
+    actual=df_dp["Demand"].values,
+    fuzzy=df_fuzzy["Prediksi_Impor_Fuzzy"].values,
+    baseline=df_dp["Impor_Optimal"].values
+)
+
+st.dataframe(df_validation, use_container_width=True)
+
+# ==========================================================
+# UJI ANOVA Fuzzy vs DP vs Actual
+# ==========================================================
+st.header("📊 Uji ANOVA Prediksi Fuzzy vs DP vs Demand Aktual")
+
+anova_stat, anova_p = f_oneway(
+    df_fuzzy["Prediksi_Impor_Fuzzy"].values,
+    df_dp["Impor_Optimal"].values,
+    df_dp["Demand"].values
+)
+
+st.markdown(f"""
+- **F-statistic:** {anova_stat:.4f}  
+- **p-value:** {anova_p:.4f}  
+- **Signifikan pada α=0.05:** {'Ya' if anova_p < 0.05 else 'Tidak'}
+""")
+# ==========================================================
 # RINGKASAN HASIL
 # ==========================================================
 st.header("📌 Ringkasan Hasil")
@@ -86,35 +131,6 @@ ax.legend()
 ax.grid(True)
 st.pyplot(fig)
 
-# ==========================================================
-# VALIDASI FUZZY + DIEBOLD–MARIANO
-# ==========================================================
-st.header("📊 Validasi Prediksi Fuzzy & DM Test")
-
-df_validation = validation_summary(
-    actual=df_dp["Demand"].values,
-    fuzzy=df_fuzzy["Prediksi_Impor_Fuzzy"].values,
-    baseline=df_dp["Impor_Optimal"].values
-)
-
-st.dataframe(df_validation, use_container_width=True)
-
-# ==========================================================
-# UJI ANOVA Fuzzy vs DP vs Actual
-# ==========================================================
-st.header("📊 Uji ANOVA Prediksi Fuzzy vs DP vs Demand Aktual")
-
-anova_stat, anova_p = f_oneway(
-    df_fuzzy["Prediksi_Impor_Fuzzy"].values,
-    df_dp["Impor_Optimal"].values,
-    df_dp["Demand"].values
-)
-
-st.markdown(f"""
-- **F-statistic:** {anova_stat:.4f}  
-- **p-value:** {anova_p:.4f}  
-- **Signifikan pada α=0.05:** {'Ya' if anova_p < 0.05 else 'Tidak'}
-""")
 
 # ==========================================================
 # GRAFIK PREDIKSI VS AKTUAL
@@ -153,21 +169,6 @@ ax3.legend()
 ax3.grid(True)
 st.pyplot(fig3)
 
-# ==========================================================
-# KPI DASHBOARD
-# ==========================================================
-st.header("📊 KPI Kinerja Sistem")
-
-kpi = calculate_kpis(
-    df_policy=df_dp,
-    demand=df_dp["Demand"].values,
-    import_cost=df_dp["Import_Cost"].sum() / df_dp["Impor_Optimal"].sum(),
-    holding_cost=df_dp["Holding_Cost"].sum() / df_dp["Stok_Akhir"].sum(),
-    max_stock=df_dp["Stok_Akhir"].max()
-)
-
-show_kpi_metrics(kpi)
-plot_inventory_profile(df_dp)
 
 # ==========================================================
 # DOWNLOAD LAPORAN
@@ -216,3 +217,4 @@ st.download_button(
 )
 
 st.success("✅ Halaman analisis dan pelaporan selesai")
+
