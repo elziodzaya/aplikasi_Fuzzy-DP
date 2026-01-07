@@ -6,64 +6,67 @@ import matplotlib.pyplot as plt
 from modules.dp_model import dp_deterministic_horizon
 
 # =========================================================
-# CONFIG
+# CONFIGURATION
 # =========================================================
 st.set_page_config(
-    page_title="Dynamic Programming - Import Optimation",
+    page_title="Dynamic Programming - Import Optimization",
     layout="wide"
 )
 
 st.title("⚙️ Import Optimization Using Dynamic Programming")
 st.markdown("""
-This page performs import decision optimization using Dynamic Programming (DP) with Fuzzy results as action constraints.
+This page performs import decision optimization using a Dynamic Programming (DP) approach,
+with fuzzy prediction results used as action constraints.
 """)
 
 # =========================================================
-# UPLOAD DATA HASIL FUZZY
+# UPLOAD FUZZY RESULTS
 # =========================================================
-st.subheader("📂 Upload Fuzzy Result")
+st.subheader("📂 Upload Fuzzy Prediction Results")
 
 uploaded_file = st.file_uploader(
-    "Upload file Fuzzy prediction Result",
+    "Upload Fuzzy Prediction Result File (Excel)",
     type=["xlsx"]
 )
 
 if uploaded_file:
     df = pd.read_excel(uploaded_file)
 
+    # =====================================================
+    # REQUIRED COLUMNS (CONSISTENT WITH FUZZY PAGE)
+    # =====================================================
     required_cols = [
         "Market_Demand",
         "Product_Stock",
-        "Prediksi_Impor_Fuzzy"
+        "Fuzzy_Import_Prediction"
     ]
 
     if not all(col in df.columns for col in required_cols):
         st.error(
-            "❌ File not Valid "
- 
+            "❌ Invalid file format. Required columns are missing."
         )
         st.stop()
 
-    st.success("✅ Data Fuzzy loaded")
+    st.success("✅ Fuzzy prediction data successfully loaded")
     st.dataframe(df)
 
     # =====================================================
-    # PARAMETER DP
+    # DYNAMIC PROGRAMMING PARAMETERS
     # =====================================================
-    st.subheader("🎛️ Parameter Dynamic Programming")
+    st.subheader("🎛️ Dynamic Programming Parameters")
 
     col1, col2, col3 = st.columns(3)
 
     with col1:
         holding_cost = st.number_input(
-            "Holding Cost / unit",
+            "Holding Cost per Unit",
             min_value=0.0,
             value=2.0
         )
 
     with col2:
         import_cost = st.number_input(
-            "Import Cost / unit",
+            "Import Cost per Unit",
             min_value=0.0,
             value=5.0
         )
@@ -76,17 +79,18 @@ if uploaded_file:
         )
 
     initial_stock = st.number_input(
-        "First_Stock",
+        "Initial Stock Level",
         min_value=0,
         value=int(df["Product_Stock"].iloc[0])
     )
 
     # =====================================================
-    # RUN DP
+    # RUN DYNAMIC PROGRAMMING
     # =====================================================
-    if st.button("⚙️ Run DP Optimation"):
+    if st.button("⚙️ Run Dynamic Programming Optimization"):
+
         demand = df["Market_Demand"].values
-        fuzzy_import = df["Prediksi_Impor_Fuzzy"].values
+        fuzzy_import = df["Fuzzy_Import_Prediction"].values
 
         results_dp, total_cost = dp_deterministic_horizon(
             demand=demand,
@@ -98,11 +102,12 @@ if uploaded_file:
         )
 
         # =================================================
-        # HITUNG BIAYA PER PERIODE
+        # COST CALCULATION PER PERIOD
         # =================================================
         results_dp["Import_Cost"] = (
             results_dp["Optimal_Import"] * import_cost
         )
+
         results_dp["Holding_Cost"] = (
             results_dp["Ending_stock"] * holding_cost
         )
@@ -112,75 +117,72 @@ if uploaded_file:
             results_dp["Holding_Cost"]
         )
 
-        # simpan ke session
+        # =================================================
+        # SAVE RESULTS TO SESSION
+        # =================================================
         st.session_state["dp_result"] = results_dp.copy()
         st.session_state["dp_total_cost"] = total_cost
 
-        st.success("✅ DP Result into session")
+        st.success("✅ Dynamic Programming results saved to session")
 
         # =================================================
-        # HASIL DP
+        # DP RESULTS
         # =================================================
-        st.subheader("📊 Dynamic Programming Optimation Result")
+        st.subheader("📊 Dynamic Programming Optimization Results")
         st.dataframe(results_dp)
 
         st.metric(
-            label="💰 Minimum Total_Cost (Kumulatif)",
+            label="💰 Minimum Total Cost (Cumulative)",
             value=f"{results_dp['Total_Cost'].sum():,.2f}"
         )
 
         # =================================================
-        # GRAFIK PERBANDINGAN
+        # COMPARISON PLOT
         # =================================================
-        st.subheader("📈 Comparasion Fuzzy_Import vs Optimal_Import (DP)")
+        st.subheader("📈 Comparison: Fuzzy Import vs Optimal Import (DP)")
 
         fig, ax = plt.subplots(figsize=(10, 4))
+
         ax.plot(
             results_dp["Month"],
             results_dp["Fuzzy_Import"],
             marker="o",
-            label="Fuzzy_Import"
+            label="Fuzzy Import"
         )
+
         ax.plot(
             results_dp["Month"],
             results_dp["Optimal_Import"],
             marker="s",
-            label="Optimal Import(DP)"
+            label="Optimal Import (DP)"
         )
 
         ax.set_xlabel("Month")
-        ax.set_ylabel("Total Import")
-        ax.set_title("Import Decision Comparison")
+        ax.set_ylabel("Import Quantity")
+        ax.set_title("Comparison of Import Decisions")
         ax.legend()
         ax.grid(True)
 
         st.pyplot(fig)
 
         # =================================================
-        # DOWNLOAD HASIL
+        # DOWNLOAD RESULTS
         # =================================================
-        st.subheader("⬇️ Download Result")
+        st.subheader("⬇️ Download Results")
 
-        output = pd.ExcelWriter(
-            "hasil_dp.xlsx",
-            engine="openpyxl"
-        )
+        output_file = "dp_optimization_results.xlsx"
 
-        results_dp.to_excel(
-            output,
-            index=False,
-            sheet_name="Hasil_DP"
-        )
-
-        output.close()
-
-        with open("hasil_dp.xlsx", "rb") as f:
-            st.download_button(
-                label="⬇️ Download Result (Excel)",
-                data=f,
-                file_name="hasil_dp.xlsx",
-                mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+        with pd.ExcelWriter(output_file, engine="openpyxl") as writer:
+            results_dp.to_excel(
+                writer,
+                index=False,
+                sheet_name="DP_Results"
             )
 
-
-
+        with open(output_file, "rb") as f:
+            st.download_button(
+                label="⬇️ Download Results (Excel)",
+                data=f,
+                file_name=output_file,
+                mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+            )
