@@ -1,163 +1,234 @@
 import streamlit as st
-import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
+import numpy as np
+from scipy.stats import f_oneway
 
+# ==========================================================
+# INTERNAL MODULES
+# ==========================================================
+from modules.export_excel import export_multi_sheet
+from modules.export_pdf import export_summary_pdf
 from modules.kpi_metrics import (
-    validation_summary,
-    calculate_kpis
+    calculate_kpis,
+    validation_summary
+)
+from modules.kpi_visuals import (
+    show_kpi_metrics,
+    plot_inventory_profile
 )
 
-# =========================================================
-# PAGE CONFIGURATION
-# =========================================================
+# ==========================================================
+# CONFIG & STYLING
+# ==========================================================
 st.set_page_config(
-    page_title="Analysis & Report",
+    page_title="Validation & Analysis",
     layout="wide"
 )
 
-st.title("📊 Analysis & Performance Evaluation")
-
+# KPI Card Styling
 st.markdown("""
-This page provides **performance evaluation**, **KPI analysis**, and
-**statistical validation** for:
-- Fuzzy Import Prediction
-- Dynamic Programming Optimization
+<style>
+div[data-testid="stMetric"] {
+    background-color: #ffffff;
+    border: 1px solid #e0e0e0;
+    padding: 15px 20px;
+    border-radius: 12px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+}
+label[data-testid="stMetricLabel"] {
+    font-weight: 700;
+    color: #444;
+}
+</style>
+""", unsafe_allow_html=True)
+
+st.title("📊 Analysis and Validation")
+st.markdown("""
+This page presents the **analysis of the Fuzzy System and Dynamic Programming (DP) results**,  
+including **performance KPIs, statistical validation, and final reporting**.
 """)
 
-# =========================================================
-# LOAD DP RESULTS
-# =========================================================
-if "dp_result" not in st.session_state:
-    st.warning("⚠️ Please run the Dynamic Programming page first.")
+# ==========================================================
+# LOAD DATA FROM SESSION STATE
+# ==========================================================
+st.header("📥 Loading Simulation Data")
+
+if "fuzzy_result" not in st.session_state or "dp_result" not in st.session_state:
+    st.warning("⚠️ Fuzzy or DP data is not available. Please run Page 1 and Page 2 first.")
     st.stop()
 
-df = st.session_state["dp_result"].copy()
+df_fuzzy = st.session_state["fuzzy_result"].copy()
+df_dp = st.session_state["dp_result"].copy()
 
-# =========================================================
-# DATA VALIDATION (HARD CHECK)
-# =========================================================
-required_cols = [
-    "Month",
-    "Demand",
-    "Fuzzy_Import",
-    "Optimal_Import",
-    "Ending_Stock",
-    "Holding_Cost",
-    "Import_Cost",
-    "Total_Cost"
-]
+st.success("✅ Fuzzy and DP data successfully loaded")
 
-missing_cols = [c for c in required_cols if c not in df.columns]
-
-if missing_cols:
-    st.error("❌ Missing required columns:")
-    st.write(missing_cols)
-    st.stop()
-
-# =========================================================
-# PREVIEW DATA
-# =========================================================
-st.subheader("📄 Final Optimization Dataset")
-st.dataframe(df, use_container_width=True)
-
-# =========================================================
-# KPI – DYNAMIC PROGRAMMING
-# =========================================================
-st.subheader("📌 Key Performance Indicators (DP Policy)")
+# ==========================================================
+# KPI DASHBOARD
+# ==========================================================
+st.header("📊 System Performance KPIs")
 
 kpi = calculate_kpis(
-    df_policy=df,
-    demand=df["Demand"].values,
-    import_cost=df["Import_Cost"].mean(),
-    holding_cost=df["Holding_Cost"].mean(),
-    max_stock=df["Ending_Stock"].max()
+    df_policy=df_dp,
+    demand=df_dp["Demand"].values,
+    import_cost=df_dp["Import_Cost"].mean(),
+    holding_cost=df_dp["Holding_Cost"].mean(),
+    max_stock=df_dp["Ending_Stock"].max()
 )
 
-kpi_df = pd.DataFrame.from_dict(kpi, orient="index", columns=["Value"])
-st.dataframe(kpi_df, use_container_width=True)
+show_kpi_metrics(kpi)
+plot_inventory_profile(df_dp)
 
-# =========================================================
-# ERROR METRICS & STATISTICAL VALIDATION
-# =========================================================
-st.subheader("📐 Prediction Accuracy & Statistical Test")
+# ==========================================================
+# FUZZY VALIDATION + DIEBOLD–MARIANO TEST
+# ==========================================================
+st.header("📊 Fuzzy Prediction Validation & DM Test")
 
-validation_df = validation_summary(
-    actual=df["Demand"].values,
-    fuzzy=df["Fuzzy_Import"].values,
-    baseline=df["Optimal_Import"].values
+df_validation = validation_summary(
+    actual=df_dp["Demand"].values,
+    fuzzy=df_dp["Fuzzy_Import"].values,
+    baseline=df_dp["Optimal_Import"].values
 )
 
-st.dataframe(validation_df, use_container_width=True)
+st.dataframe(df_validation, use_container_width=True)
 
-# =========================================================
-# COST ANALYSIS
-# =========================================================
-st.subheader("💰 Cost Breakdown Over Time")
+# ==========================================================
+# ANOVA TEST
+# ==========================================================
+st.header("📊 ANOVA Test: Fuzzy vs DP vs Actual Demand")
 
-fig, ax = plt.subplots(figsize=(10, 4))
-
-ax.plot(df["Month"], df["Holding_Cost"], label="Holding Cost", marker="o")
-ax.plot(df["Month"], df["Import_Cost"], label="Import Cost", marker="s")
-ax.plot(df["Month"], df["Total_Cost"], label="Total Cost", linewidth=2)
-
-ax.set_xlabel("Month")
-ax.set_ylabel("Cost")
-ax.set_title("Cost Components Over Time")
-ax.legend()
-ax.grid(True)
-
-st.pyplot(fig)
-
-# =========================================================
-# INVENTORY LEVEL ANALYSIS
-# =========================================================
-st.subheader("📦 Inventory Level Analysis")
-
-fig2, ax2 = plt.subplots(figsize=(10, 4))
-
-ax2.plot(
-    df["Month"],
-    df["Ending_Stock"],
-    marker="o",
-    label="Ending Stock"
+anova_stat, anova_p = f_oneway(
+    df_dp["Fuzzy_Import"].values,
+    df_dp["Optimal_Import"].values,
+    df_dp["Demand"].values
 )
 
-ax2.axhline(
-    y=df["Ending_Stock"].mean(),
-    linestyle="--",
-    label="Average Stock"
-)
+st.markdown(f"""
+- **F-statistic:** {anova_stat:.4f}  
+- **p-value:** {anova_p:.4f}  
+- **Significant at α = 0.05:** {'Yes' if anova_p < 0.05 else 'No'}
+""")
 
-ax2.set_xlabel("Month")
-ax2.set_ylabel("Stock Level")
-ax2.set_title("Ending Inventory Level Over Time")
-ax2.legend()
-ax2.grid(True)
+# ==========================================================
+# PERFORMANCE SUMMARY
+# ==========================================================
+st.header("📌 Performance Summary")
 
-st.pyplot(fig2)
-
-# =========================================================
-# SUMMARY METRICS
-# =========================================================
-st.subheader("📊 Summary Metrics")
+total_fuzzy_import = df_dp["Fuzzy_Import"].sum()
+total_dp_import = df_dp["Optimal_Import"].sum()
+total_cost = df_dp["Total_Cost"].sum()
 
 col1, col2, col3 = st.columns(3)
+col1.metric("Total Import (Fuzzy)", f"{int(total_fuzzy_import):,}")
+col2.metric("Total Import (DP)", f"{int(total_dp_import):,}")
+col3.metric("Total System Cost", f"{int(total_cost):,}")
 
-with col1:
-    st.metric(
-        "Total Cost",
-        f"{df['Total_Cost'].sum():,.2f}"
-    )
+# ==========================================================
+# MONTHLY ANALYSIS
+# ==========================================================
+st.header("📋 Monthly Analysis")
 
-with col2:
-    st.metric(
-        "Average Inventory",
-        f"{df['Ending_Stock'].mean():,.2f}"
-    )
+df_analysis = pd.DataFrame({
+    "Month": df_dp["Month"].astype(str),
+    "Demand": df_dp["Demand"],
+    "Initial Stock": df_dp["Starting_Stock"],
+    "Import (Fuzzy)": df_dp["Fuzzy_Import"],
+    "Optimal Import (DP)": df_dp["Optimal_Import"],
+    "Final Stock": df_dp["Ending_Stock"],
+    "Total Cost": df_dp["Total_Cost"]
+})
 
-with col3:
-    st.metric(
-        "Service Level",
-        f"{(df['Ending_Stock'] > 0).mean() * 100:.2f}%"
+st.dataframe(df_analysis, use_container_width=True)
+
+# ==========================================================
+# IMPORT COMPARISON VISUALIZATION
+# ==========================================================
+st.header("📈 Import Comparison Visualizations")
+
+col_fig1, col_fig2 = st.columns(2)
+
+with col_fig1:
+    fig1, ax1 = plt.subplots(figsize=(10, 5))
+    ax1.plot(
+        df_analysis["Month"],
+        df_analysis["Import (Fuzzy)"],
+        marker="o",
+        label="Fuzzy Import"
     )
+    ax1.plot(
+        df_analysis["Month"],
+        df_analysis["Optimal Import (DP)"],
+        marker="s",
+        label="DP Import"
+    )
+    ax1.set_xlabel("Month")
+    ax1.set_ylabel("Import Quantity")
+    ax1.set_title("Fuzzy vs Dynamic Programming Import Comparison")
+    ax1.legend()
+    ax1.grid(True)
+    st.pyplot(fig1)
+
+with col_fig2:
+    fig2, ax2 = plt.subplots(figsize=(10, 5))
+    errors_fuzzy = np.abs(df_dp["Demand"] - df_dp["Fuzzy_Import"])
+    errors_dp = np.abs(df_dp["Demand"] - df_dp["Optimal_Import"])
+    x = np.arange(len(df_dp))
+
+    ax2.bar(x - 0.2, errors_fuzzy, 0.4, label="Fuzzy Error")
+    ax2.bar(x + 0.2, errors_dp, 0.4, label="DP Error")
+    ax2.set_xticks(x)
+    ax2.set_xticklabels(df_dp["Month"].astype(str), rotation=45)
+    ax2.set_title("Absolute Error Comparison")
+    ax2.legend()
+    ax2.grid(True, axis="y")
+    st.pyplot(fig2)
+
+# ==========================================================
+# DOWNLOAD REPORTS
+# ==========================================================
+st.header("⬇️ Download Reports")
+
+excel_buffer = export_multi_sheet({
+    "Fuzzy_Result": df_fuzzy,
+    "DP_Result": df_dp,
+    "Final_Analysis": df_analysis,
+    "Validation_Fuzzy": df_validation,
+    "ANOVA_Test": pd.DataFrame({
+        "F-statistic": [anova_stat],
+        "p-value": [anova_p],
+        "Significant (α=0.05)": ["Yes" if anova_p < 0.05 else "No"]
+    })
+})
+
+st.download_button(
+    label="📥 Download Excel Report (Multi-Sheet)",
+    data=excel_buffer,
+    file_name="Fuzzy_DP_Report.xlsx",
+    mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    use_container_width=True
+)
+
+pdf_buffer = export_summary_pdf(
+    title="Final Import Decision Support System Report",
+    metrics={
+        "Total Fuzzy Import": f"{int(total_fuzzy_import):,}",
+        "Total DP Import": f"{int(total_dp_import):,}",
+        "Total Cost": f"{int(total_cost):,}"
+    },
+    conclusion=(
+        "The integration of fuzzy logic and dynamic programming "
+        "successfully generates an optimal import policy with "
+        "minimum cost and improved inventory control. "
+        "Statistical validation confirms performance differences."
+    )
+)
+
+st.download_button(
+    label="📥 Download PDF Summary Report",
+    data=pdf_buffer,
+    file_name="Fuzzy_DP_Summary.pdf",
+    mime="application/pdf",
+    use_container_width=True
+)
+
+st.success("✅ Analysis and reporting completed successfully.")
