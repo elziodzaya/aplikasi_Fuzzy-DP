@@ -33,7 +33,7 @@ if uploaded_file:
     df = pd.read_excel(uploaded_file)
 
     # =====================================================
-    # REQUIRED COLUMNS (CONSISTENT WITH FUZZY PAGE)
+    # REQUIRED COLUMNS FROM FUZZY PAGE
     # =====================================================
     required_cols = [
         "Market_Demand",
@@ -43,7 +43,9 @@ if uploaded_file:
 
     if not all(col in df.columns for col in required_cols):
         st.error(
-            "❌ Invalid file format. Required columns are missing."
+            f"❌ Invalid file format.\n\n"
+            f"Required columns:\n{required_cols}\n\n"
+            f"Detected columns:\n{df.columns.tolist()}"
         )
         st.stop()
 
@@ -101,6 +103,34 @@ if uploaded_file:
             initial_stock=int(initial_stock)
         )
 
+        # =====================================================
+        # 🔍 DETECT & STANDARDIZE COLUMN NAMES (CRITICAL FIX)
+        # =====================================================
+        possible_opt_cols = [
+            "Optimal_Import",
+            "Optimal_Import_DP",
+            "optimal_import",
+            "Import",
+            "Import_Quantity",
+            "Decision"
+        ]
+
+        opt_col = None
+        for c in possible_opt_cols:
+            if c in results_dp.columns:
+                opt_col = c
+                break
+
+        if opt_col is None:
+            st.error(
+                "❌ Dynamic Programming output does not contain an optimal import column.\n\n"
+                f"Available columns:\n{results_dp.columns.tolist()}"
+            )
+            st.stop()
+
+        # rename to standard
+        results_dp = results_dp.rename(columns={opt_col: "Optimal_Import"})
+
         # =================================================
         # COST CALCULATION PER PERIOD
         # =================================================
@@ -121,9 +151,9 @@ if uploaded_file:
         # SAVE RESULTS TO SESSION
         # =================================================
         st.session_state["dp_result"] = results_dp.copy()
-        st.session_state["dp_total_cost"] = total_cost
+        st.session_state["dp_total_cost"] = results_dp["Total_Cost"].sum()
 
-        st.success("✅ Dynamic Programming results saved to session")
+        st.success("✅ Dynamic Programming results successfully computed")
 
         # =================================================
         # DP RESULTS
@@ -144,20 +174,20 @@ if uploaded_file:
         fig, ax = plt.subplots(figsize=(10, 4))
 
         ax.plot(
-            results_dp["Month"],
-            results_dp["Fuzzy_Import"],
+            results_dp.index,
+            fuzzy_import,
             marker="o",
             label="Fuzzy Import"
         )
 
         ax.plot(
-            results_dp["Month"],
+            results_dp.index,
             results_dp["Optimal_Import"],
             marker="s",
             label="Optimal Import (DP)"
         )
 
-        ax.set_xlabel("Month")
+        ax.set_xlabel("Period")
         ax.set_ylabel("Import Quantity")
         ax.set_title("Comparison of Import Decisions")
         ax.legend()
