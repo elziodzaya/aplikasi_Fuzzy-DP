@@ -1,18 +1,20 @@
 import streamlit as st
 import pandas as pd
-import matplotlib.pyplot as plt
 import numpy as np
+import matplotlib.pyplot as plt
 from scipy.stats import f_oneway
 
-# Internal modules
+# =========================
+# INTERNAL MODULES
+# =========================
 from modules.export_excel import export_multi_sheet
 from modules.export_pdf import export_summary_pdf
 from modules.kpi_metrics import calculate_kpis, validation_summary
 from modules.kpi_visuals import show_kpi_metrics, plot_inventory_profile
 
-# ==========================================================
-# CONFIG
-# ==========================================================
+# =========================
+# PAGE CONFIG
+# =========================
 st.set_page_config(
     page_title="Analysis & Validation",
     layout="wide"
@@ -20,60 +22,90 @@ st.set_page_config(
 
 st.title("📊 Analysis and Validation")
 st.markdown("""
-This page presents **performance analysis, statistical validation, 
-and final reporting** of the **Fuzzy Logic and Dynamic Programming (DP) integration**.
+This page presents a **comprehensive analysis of the Fuzzy Logic System and
+Dynamic Programming (DP) optimization results**, including:
+- KPI evaluation  
+- Statistical validation (DM Test & ANOVA)  
+- Final reporting in **Excel and PDF**
 """)
 
-# ==========================================================
+# =========================
 # LOAD SESSION DATA
-# ==========================================================
-st.header("📥 Loading Simulation Data")
+# =========================
+st.header("📥 Load Simulation Results")
 
 if "fuzzy_result" not in st.session_state or "dp_result" not in st.session_state:
-    st.warning("⚠️ Fuzzy or DP data not found. Please run Pages 1 and 2 first.")
+    st.warning("⚠️ Fuzzy or DP results not found. Please run Page 1 and Page 2 first.")
     st.stop()
 
-df_fuzzy = st.session_state["fuzzy_result"]
-df_dp = st.session_state["dp_result"]
+df_fuzzy = st.session_state["fuzzy_result"].copy()
+df_dp = st.session_state["dp_result"].copy()
 
-st.success("✅ Simulation data successfully loaded")
+st.success("✅ Fuzzy and DP results successfully loaded")
 
 # ==========================================================
+# 🔴 CRITICAL FIX — STANDARDIZE COLUMN NAMES
+# ==========================================================
+df_dp = df_dp.rename(columns={
+    "Demand": "Market_Demand",
+    "Impor_Fuzzy": "Fuzzy_Import",
+    "Impor_Optimal": "Optimal_Import",
+    "Stok_Awal": "Starting_Stock",
+    "Stok_Akhir": "Ending_Stock"
+})
+
+# Debug safety check (can be removed after verification)
+required_cols = [
+    "Market_Demand",
+    "Fuzzy_Import",
+    "Optimal_Import",
+    "Starting_Stock",
+    "Ending_Stock",
+    "Holding_Cost",
+    "Import_Cost"
+]
+
+missing = [c for c in required_cols if c not in df_dp.columns]
+if missing:
+    st.error(f"❌ Missing required DP columns: {missing}")
+    st.stop()
+
+# =========================
 # KPI DASHBOARD
-# ==========================================================
+# =========================
 st.header("📊 System Performance KPIs")
 
 kpi = calculate_kpis(
     df_policy=df_dp,
     demand=df_dp["Market_Demand"].values,
     import_cost=df_dp["Import_Cost"].sum() / df_dp["Optimal_Import"].sum(),
-    holding_cost=df_dp["Holding_Cost"].sum() / df_dp["Ending_Stock"].sum(),
+    holding_cost=df_dp["Holding_Cost"].sum() / df_dp["Ending_Stock"].mean(),
     max_stock=df_dp["Ending_Stock"].max()
 )
 
 show_kpi_metrics(kpi)
 plot_inventory_profile(df_dp)
 
-# ==========================================================
-# FUZZY VALIDATION + DM TEST
-# ==========================================================
+# =========================
+# FUZZY VALIDATION & DM TEST
+# =========================
 st.header("📊 Fuzzy Prediction Validation")
 
 df_validation = validation_summary(
     actual=df_dp["Market_Demand"].values,
-    fuzzy=df_fuzzy["Fuzzy_Import_Prediction"].values,
+    fuzzy=df_fuzzy["Prediksi_Impor_Fuzzy"].values,
     baseline=df_dp["Optimal_Import"].values
 )
 
 st.dataframe(df_validation, use_container_width=True)
 
-# ==========================================================
+# =========================
 # ANOVA TEST
-# ==========================================================
-st.header("📊 ANOVA Test: Fuzzy vs DP vs Actual Demand")
+# =========================
+st.header("📊 ANOVA Test")
 
 anova_stat, anova_p = f_oneway(
-    df_fuzzy["Fuzzy_Import_Prediction"].values,
+    df_fuzzy["Prediksi_Impor_Fuzzy"].values,
     df_dp["Optimal_Import"].values,
     df_dp["Market_Demand"].values
 )
@@ -81,15 +113,15 @@ anova_stat, anova_p = f_oneway(
 st.markdown(f"""
 - **F-statistic:** {anova_stat:.4f}  
 - **p-value:** {anova_p:.4f}  
-- **Significant at α = 0.05:** {'Yes' if anova_p < 0.05 else 'No'}
+- **Significant (α = 0.05):** {"Yes" if anova_p < 0.05 else "No"}
 """)
 
-# ==========================================================
+# =========================
 # PERFORMANCE SUMMARY
-# ==========================================================
+# =========================
 st.header("📌 Performance Summary")
 
-total_fuzzy_import = df_fuzzy["Fuzzy_Import_Prediction"].sum()
+total_fuzzy_import = df_fuzzy["Prediksi_Impor_Fuzzy"].sum()
 total_dp_import = df_dp["Optimal_Import"].sum()
 total_cost = df_dp["Total_Cost"].sum()
 
@@ -98,35 +130,35 @@ col1.metric("Total Import (Fuzzy)", f"{int(total_fuzzy_import):,}")
 col2.metric("Total Import (DP)", f"{int(total_dp_import):,}")
 col3.metric("Total System Cost", f"{int(total_cost):,}")
 
-# ==========================================================
-# MONTHLY ANALYSIS
-# ==========================================================
+# =========================
+# MONTHLY ANALYSIS TABLE
+# =========================
 st.header("📋 Monthly Analysis")
 
 df_analysis = pd.DataFrame({
-    "Month": df_dp["Month"],
-    "Market Demand": df_dp["Market_Demand"],
-    "Starting Stock": df_dp["Starting_Stock"],
-    "Import (Fuzzy)": df_fuzzy["Fuzzy_Import_Prediction"],
+    "Month": df_dp["Month"].astype(str),
+    "Demand": df_dp["Market_Demand"],
+    "Initial Stock": df_dp["Starting_Stock"],
+    "Fuzzy Import": df_fuzzy["Prediksi_Impor_Fuzzy"],
     "Optimal Import (DP)": df_dp["Optimal_Import"],
-    "Ending Stock": df_dp["Ending_Stock"],
+    "Final Stock": df_dp["Ending_Stock"],
     "Total Cost": df_dp["Total_Cost"]
 })
 
 st.dataframe(df_analysis, use_container_width=True)
 
-# ==========================================================
-# VISUALIZATION
-# ==========================================================
-st.header("📈 Import & Error Comparison")
+# =========================
+# VISUAL COMPARISON
+# =========================
+st.header("📈 Import Comparison")
 
 col1, col2 = st.columns(2)
 
 with col1:
-    fig1, ax1 = plt.subplots(figsize=(10, 5))
-    ax1.plot(df_analysis["Month"], df_analysis["Import (Fuzzy)"], marker="o", label="Fuzzy Import")
-    ax1.plot(df_analysis["Month"], df_analysis["Optimal Import (DP)"], marker="s", label="DP Import")
-    ax1.set_title("Fuzzy vs DP Import Decision")
+    fig1, ax1 = plt.subplots(figsize=(9, 5))
+    ax1.plot(df_analysis["Month"], df_analysis["Fuzzy Import"], marker="o", label="Fuzzy")
+    ax1.plot(df_analysis["Month"], df_analysis["Optimal Import (DP)"], marker="s", label="DP")
+    ax1.set_title("Import Decision Comparison")
     ax1.set_xlabel("Month")
     ax1.set_ylabel("Import Quantity")
     ax1.legend()
@@ -134,23 +166,20 @@ with col1:
     st.pyplot(fig1)
 
 with col2:
-    fig2, ax2 = plt.subplots(figsize=(10, 5))
-    err_fuzzy = abs(df_dp["Market_Demand"] - df_fuzzy["Fuzzy_Import_Prediction"])
-    err_dp = abs(df_dp["Market_Demand"] - df_dp["Optimal_Import"])
-    x = np.arange(len(err_fuzzy))
-
-    ax2.bar(x - 0.2, err_fuzzy, 0.4, label="Fuzzy Error")
-    ax2.bar(x + 0.2, err_dp, 0.4, label="DP Error")
-    ax2.set_xticks(x)
-    ax2.set_xticklabels(df_dp["Month"], rotation=45)
+    fig2, ax2 = plt.subplots(figsize=(9, 5))
+    error_fuzzy = np.abs(df_dp["Market_Demand"] - df_fuzzy["Prediksi_Impor_Fuzzy"])
+    error_dp = np.abs(df_dp["Market_Demand"] - df_dp["Optimal_Import"])
+    x = np.arange(len(error_fuzzy))
+    ax2.bar(x - 0.2, error_fuzzy, 0.4, label="Fuzzy Error")
+    ax2.bar(x + 0.2, error_dp, 0.4, label="DP Error")
     ax2.set_title("Absolute Error Comparison")
     ax2.legend()
     ax2.grid(axis="y")
     st.pyplot(fig2)
 
-# ==========================================================
+# =========================
 # DOWNLOAD REPORTS
-# ==========================================================
+# =========================
 st.header("⬇️ Download Reports")
 
 excel_buffer = export_multi_sheet({
@@ -158,17 +187,17 @@ excel_buffer = export_multi_sheet({
     "DP_Result": df_dp,
     "Monthly_Analysis": df_analysis,
     "Validation": df_validation,
-    "ANOVA_Test": pd.DataFrame({
+    "ANOVA": pd.DataFrame({
         "F-statistic": [anova_stat],
         "p-value": [anova_p],
-        "Significant (α=0.05)": ["Yes" if anova_p < 0.05 else "No"]
+        "Significant": [anova_p < 0.05]
     })
 })
 
 st.download_button(
-    "📥 Download Excel Report",
-    excel_buffer,
-    "Fuzzy_DP_Final_Report.xlsx",
+    label="📥 Download Excel Report",
+    data=excel_buffer,
+    file_name="Fuzzy_DP_Analysis_Report.xlsx",
     mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
 )
 
@@ -180,17 +209,16 @@ pdf_buffer = export_summary_pdf(
         "Total Cost": f"{int(total_cost):,}"
     },
     conclusion=(
-        "The integration of fuzzy logic and dynamic programming "
-        "successfully produces an optimal import policy with "
-        "lower costs and improved inventory control. "
-        "Statistical validation confirms significant performance differences."
+        "The integration of fuzzy logic and dynamic programming successfully "
+        "produces an optimal import policy with lower costs, improved service level, "
+        "and statistically significant performance improvements."
     )
 )
 
 st.download_button(
-    "📥 Download PDF Summary",
-    pdf_buffer,
-    "Fuzzy_DP_Summary.pdf",
+    label="📥 Download PDF Summary",
+    data=pdf_buffer,
+    file_name="Fuzzy_DP_Summary.pdf",
     mime="application/pdf"
 )
 
