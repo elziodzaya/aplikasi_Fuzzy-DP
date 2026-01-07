@@ -9,7 +9,7 @@ from modules.dp_model import dp_deterministic_horizon
 # CONFIG
 # =========================================================
 st.set_page_config(
-    page_title="Dynamic Programming - Optimasi Impor",
+    page_title="Dynamic Programming - Import Optimation",
     layout="wide"
 )
 
@@ -70,13 +70,13 @@ if uploaded_file:
 
     with col3:
         max_stock = st.number_input(
-            "Kapasitas Gudang Maksimum",
+            "Maximum Warehouse Capacity",
             min_value=1,
             value=500
         )
 
     initial_stock = st.number_input(
-        "Stok Awal",
+        "First_Stock",
         min_value=0,
         value=int(df["Product_Stock"].iloc[0])
     )
@@ -101,10 +101,10 @@ if uploaded_file:
         # HITUNG BIAYA PER PERIODE
         # =================================================
         results_dp["Import_Cost"] = (
-            results_dp["Impor_Optimal"] * import_cost
+            results_dp["Import_Optimal"] * import_cost
         )
         results_dp["Holding_Cost"] = (
-            results_dp["Stok_Akhir"] * holding_cost
+            results_dp["Ending_stock"] * holding_cost
         )
 
         results_dp["Total_Cost"] = (
@@ -137,9 +137,9 @@ if uploaded_file:
         fig, ax = plt.subplots(figsize=(10, 4))
         ax.plot(
             results_dp["Month"],
-            results_dp["Impor_Fuzzy"],
+            results_dp["Fuzzy_Import"],
             marker="o",
-            label="Impor Fuzzy"
+            label="Fuzzy_Import"
         )
         ax.plot(
             results_dp["Month"],
@@ -181,4 +181,5 @@ if uploaded_file:
                 file_name="hasil_dp.xlsx",
                 mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
             )
+
 
