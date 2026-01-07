@@ -146,5 +146,6 @@ st.markdown("<br>", unsafe_allow_html=True)
 
 col1, col2, col3 = st.columns([1, 2, 1])
 with col2:
-    if st.button("🚀 Enter Simulation Application", use_container_width=True):
+    if st.button("🚀 Run Simulation ", use_container_width=True):
         st.switch_page("pages/1_Fuzzy_System.py")
+
