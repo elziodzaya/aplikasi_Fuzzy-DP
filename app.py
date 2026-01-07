@@ -136,16 +136,11 @@ st.markdown("""
             <b>Supervisor:</b> Ir. Dr.-Eng. Mairiza Zainuddin<br>
         </div>
     </div>
-    <div class='btn-wrap'>
-        if st.button("🚀 Enter Simulation Application"):
-        st.session_state["page"] = "simulation"
-    </div>
+    
 </div>
 """, unsafe_allow_html=True)
 
-# =============================
-# BUTTON
-# =============================
+
 
 
 
