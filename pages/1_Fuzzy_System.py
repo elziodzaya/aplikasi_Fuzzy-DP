@@ -22,12 +22,12 @@ system, md, ps, pc, pi = build_fuzzy_system()
 # =========================================================
 # MEMBERSHIP FUNCTION (DENGAN TOMBOL)
 # =========================================================
-st.subheader("📐 Fungsi Keanggotaan")
+st.subheader("📐 Membership Function")
 
 if 'show_mf' not in st.session_state:
     st.session_state.show_mf = False
 
-if st.button("📐 Tampilkan / Sembunyikan Grafik Membership Function"):
+if st.button("📐 Show "):
     st.session_state.show_mf = not st.session_state.show_mf
 
 if st.session_state.show_mf:
@@ -72,7 +72,7 @@ st.subheader("🧩 Surface Fuzzy (3D)")
 if 'show_surface' not in st.session_state:
     st.session_state.show_surface = False
 
-if st.button("🧩 Tampilkan / Sembunyikan Surface Fuzzy"):
+if st.button("🧩 Show "):
     st.session_state.show_surface = not st.session_state.show_surface
 
 if st.session_state.show_surface:
@@ -91,9 +91,9 @@ if st.session_state.show_surface:
 # =========================================================
 # UPLOAD DATA
 # =========================================================
-st.subheader("📂 Upload Data Simulasi AnyLogic")
+st.subheader("📂 Upload Data AnyLogic")
 uploaded_file = st.file_uploader(
-    "Upload file CSV atau Excel",
+    "Upload file CSV / Excel",
     type=["csv", "xlsx"]
 )
 
@@ -110,13 +110,13 @@ if uploaded_file:
         'Production': 'Production_Capacity'
     })
 
-    st.success("✅ Data berhasil diunggah")
+    st.success("✅ Data Uploaded")
     st.dataframe(df)
 
     # =====================================================
     # FUZZY PREDICTION
     # =====================================================
-    if st.button("🔍 Prediksi Impor dengan Fuzzy"):
+    if st.button("🔍 Fuzzy Prediction"):
         predictions = []
 
         for _, row in df.iterrows():
@@ -132,18 +132,18 @@ if uploaded_file:
 
         st.session_state["fuzzy_result"] = df.copy()
 
-        st.success("✅ Hasil fuzzy disimpan ke session")
+        st.success("✅ Saved Result into session")
         st.dataframe(df)
         # =================================================
         # HASIL
         # =================================================
-        st.subheader("📈 Hasil Prediksi Impor (Fuzzy)")
+        st.subheader("📈 Import Prediction Result (Fuzzy)")
         st.dataframe(df)
 
         # =================================================
         # TIME SERIES PLOT
         # =================================================
-        st.subheader("📉 Plot Time Series Prediksi Impor")
+        st.subheader("📉 Plot Time Series Import Prediction")
 
         fig, ax = plt.subplots(figsize=(10, 4))
         ax.plot(
@@ -153,7 +153,7 @@ if uploaded_file:
         )
         ax.set_xlabel("Bulan")
         ax.set_ylabel("Jumlah Impor")
-        ax.set_title("Time Series Prediksi Impor Menggunakan Fuzzy")
+        ax.set_title("Time Series Import Prediction")
         ax.grid(True)
         plt.xticks(rotation=45)
 
@@ -173,8 +173,9 @@ if uploaded_file:
         output.seek(0)
 
         st.download_button(
-            label="⬇️ Download Hasil Prediksi (Excel)",
+            label="⬇️ Download Result (Excel)",
             data=output,
             file_name="fuzzy_predictions.xlsx",
             mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
         )
+
