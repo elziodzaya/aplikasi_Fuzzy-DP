@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 from modules.dp_model import dp_deterministic_horizon
 
 # =========================================================
-# CONFIGURATION
+# PAGE CONFIGURATION
 # =========================================================
 st.set_page_config(
     page_title="Dynamic Programming - Import Optimization",
@@ -14,9 +14,10 @@ st.set_page_config(
 )
 
 st.title("⚙️ Import Optimization Using Dynamic Programming")
+
 st.markdown("""
-This page performs import decision optimization using a Dynamic Programming (DP) approach,
-with fuzzy prediction results used as action constraints.
+This page optimizes import decisions using a **Dynamic Programming (DP)** approach.
+The **Fuzzy System output** is used as a constraint/reference for optimization.
 """)
 
 # =========================================================
@@ -33,27 +34,31 @@ if uploaded_file:
     df = pd.read_excel(uploaded_file)
 
     # =====================================================
-    # REQUIRED COLUMNS FROM FUZZY PAGE
+    # REQUIRED COLUMNS (OFFICIAL CONTRACT)
     # =====================================================
     required_cols = [
-        "Market_Demand",
-        "Product_Stock",
-        "Fuzzy_Import_Prediction"
+        "Month",
+        "Demand",
+        "Initial_Stock",
+        "Fuzzy_Import"
     ]
 
     if not all(col in df.columns for col in required_cols):
-        st.error(
-            f"❌ Invalid file format.\n\n"
-            f"Required columns:\n{required_cols}\n\n"
-            f"Detected columns:\n{df.columns.tolist()}"
-        )
+        st.error("❌ Invalid file format.")
+        st.write("Required columns:", required_cols)
+        st.write("Detected columns:", list(df.columns))
         st.stop()
 
+    # =====================================================
+    # DATA PREVIEW
+    # =====================================================
+    df["Month"] = df["Month"].astype(str)
+
     st.success("✅ Fuzzy prediction data successfully loaded")
-    st.dataframe(df)
+    st.dataframe(df, use_container_width=True)
 
     # =====================================================
-    # DYNAMIC PROGRAMMING PARAMETERS
+    # DP PARAMETERS
     # =====================================================
     st.subheader("🎛️ Dynamic Programming Parameters")
 
@@ -83,16 +88,16 @@ if uploaded_file:
     initial_stock = st.number_input(
         "Initial Stock Level",
         min_value=0,
-        value=int(df["Product_Stock"].iloc[0])
+        value=int(df["Initial_Stock"].iloc[0])
     )
 
     # =====================================================
-    # RUN DYNAMIC PROGRAMMING
+    # RUN DP
     # =====================================================
     if st.button("⚙️ Run Dynamic Programming Optimization"):
 
-        demand = df["Market_Demand"].values
-        fuzzy_import = df["Fuzzy_Import_Prediction"].values
+        demand = df["Demand"].values
+        fuzzy_import = df["Fuzzy_Import"].values
 
         results_dp, total_cost = dp_deterministic_horizon(
             demand=demand,
@@ -103,21 +108,25 @@ if uploaded_file:
             initial_stock=int(initial_stock)
         )
 
-        # =====================================================
-        # 🔑 COLUMN STANDARDIZATION (FINAL FIX)
-        # =====================================================
-        rename_map = {
+        # =================================================
+        # FINAL COLUMN STANDARDIZATION
+        # =================================================
+        results_dp = results_dp.rename(columns={
             "Impor_Optimal": "Optimal_Import",
             "Impor_Fuzzy": "Fuzzy_Import",
             "Stok_Awal": "Starting_Stock",
             "Stok_Akhir": "Ending_Stock",
-            "Demand": "Market_Demand"
-        }
-
-        results_dp = results_dp.rename(columns=rename_map)
+            "Demand": "Demand"
+        })
 
         # =================================================
-        # TOTAL COST (SAFE)
+        # ADD TIME INDEX
+        # =================================================
+        results_dp["Month"] = df["Month"].values
+        results_dp["Initial_Stock"] = df["Initial_Stock"].values
+
+        # =================================================
+        # TOTAL COST
         # =================================================
         results_dp["Total_Cost"] = (
             results_dp["Holding_Cost"] +
@@ -130,13 +139,13 @@ if uploaded_file:
         st.session_state["dp_result"] = results_dp.copy()
         st.session_state["dp_total_cost"] = results_dp["Total_Cost"].sum()
 
-        st.success("✅ Dynamic Programming results successfully computed")
+        st.success("✅ Dynamic Programming optimization completed")
 
         # =================================================
-        # DP RESULTS
+        # RESULTS TABLE
         # =================================================
-        st.subheader("📊 Dynamic Programming Optimization Results")
-        st.dataframe(results_dp)
+        st.subheader("📊 Dynamic Programming Results")
+        st.dataframe(results_dp, use_container_width=True)
 
         st.metric(
             label="💰 Minimum Total Cost (Cumulative)",
@@ -146,7 +155,7 @@ if uploaded_file:
         # =================================================
         # COMPARISON PLOT
         # =================================================
-        st.subheader("📈 Comparison: Fuzzy Import vs Optimal Import (DP)")
+        st.subheader("📈 Fuzzy Import vs Optimal Import (DP)")
 
         fig, ax = plt.subplots(figsize=(10, 4))
 
@@ -175,21 +184,19 @@ if uploaded_file:
         # =================================================
         # DOWNLOAD RESULTS
         # =================================================
-        st.subheader("⬇️ Download Results")
+        output = "dp_optimization_results.xlsx"
 
-        output_file = "dp_optimization_results.xlsx"
-
-        with pd.ExcelWriter(output_file, engine="openpyxl") as writer:
+        with pd.ExcelWriter(output, engine="openpyxl") as writer:
             results_dp.to_excel(
                 writer,
                 index=False,
                 sheet_name="DP_Results"
             )
 
-        with open(output_file, "rb") as f:
+        with open(output, "rb") as f:
             st.download_button(
-                label="⬇️ Download Results (Excel)",
+                label="⬇️ Download DP Results (Excel)",
                 data=f,
-                file_name=output_file,
+                file_name=output,
                 mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
             )
