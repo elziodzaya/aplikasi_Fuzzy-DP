@@ -104,51 +104,28 @@ if uploaded_file:
         )
 
         # =====================================================
-        # 🔍 DETECT & STANDARDIZE COLUMN NAMES (CRITICAL FIX)
+        # 🔑 COLUMN STANDARDIZATION (FINAL FIX)
         # =====================================================
-        possible_opt_cols = [
-            "Optimal_Import",
-            "Optimal_Import_DP",
-            "optimal_import",
-            "Import",
-            "Import_Quantity",
-            "Decision"
-        ]
+        rename_map = {
+            "Impor_Optimal": "Optimal_Import",
+            "Impor_Fuzzy": "Fuzzy_Import",
+            "Stok_Awal": "Starting_Stock",
+            "Stok_Akhir": "Ending_Stock",
+            "Demand": "Market_Demand"
+        }
 
-        opt_col = None
-        for c in possible_opt_cols:
-            if c in results_dp.columns:
-                opt_col = c
-                break
-
-        if opt_col is None:
-            st.error(
-                "❌ Dynamic Programming output does not contain an optimal import column.\n\n"
-                f"Available columns:\n{results_dp.columns.tolist()}"
-            )
-            st.stop()
-
-        # rename to standard
-        results_dp = results_dp.rename(columns={opt_col: "Optimal_Import"})
+        results_dp = results_dp.rename(columns=rename_map)
 
         # =================================================
-        # COST CALCULATION PER PERIOD
+        # TOTAL COST (SAFE)
         # =================================================
-        results_dp["Import_Cost"] = (
-            results_dp["Optimal_Import"] * import_cost
-        )
-
-        results_dp["Holding_Cost"] = (
-            results_dp["Ending_stock"] * holding_cost
-        )
-
         results_dp["Total_Cost"] = (
-            results_dp["Import_Cost"] +
-            results_dp["Holding_Cost"]
+            results_dp["Holding_Cost"] +
+            results_dp["Import_Cost"]
         )
 
         # =================================================
-        # SAVE RESULTS TO SESSION
+        # SAVE TO SESSION
         # =================================================
         st.session_state["dp_result"] = results_dp.copy()
         st.session_state["dp_total_cost"] = results_dp["Total_Cost"].sum()
@@ -174,20 +151,20 @@ if uploaded_file:
         fig, ax = plt.subplots(figsize=(10, 4))
 
         ax.plot(
-            results_dp.index,
-            fuzzy_import,
+            results_dp["Month"],
+            results_dp["Fuzzy_Import"],
             marker="o",
             label="Fuzzy Import"
         )
 
         ax.plot(
-            results_dp.index,
+            results_dp["Month"],
             results_dp["Optimal_Import"],
             marker="s",
             label="Optimal Import (DP)"
         )
 
-        ax.set_xlabel("Period")
+        ax.set_xlabel("Month")
         ax.set_ylabel("Import Quantity")
         ax.set_title("Comparison of Import Decisions")
         ax.legend()
