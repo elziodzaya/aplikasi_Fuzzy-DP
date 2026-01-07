@@ -108,51 +108,55 @@ body {
 # =============================
 # HERO CONTENT
 # =============================
-st.markdown("""
-<div class="hero">
-    <div class="hero-title">
-        DYNAMIC SYSTEM MODEL TO IMPROVE THE RATIO AND EFFICIENCY IN THE SUPPLY CHAIN
-        MANAGEMENT (SCM) DISTRIBUTION OF THE CEMENT INDUSTRY
+st.markdown(
+    """
+    <div class="hero">
+        <div class="hero-title">
+            DYNAMIC SYSTEM MODEL TO IMPROVE THE RATIO AND EFFICIENCY IN THE SUPPLY CHAIN
+            MANAGEMENT (SCM) DISTRIBUTION OF THE CEMENT INDUSTRY
+        </div>
+
+        <div class="hero-subtitle">
+            AT BANTEN PROVINCE, INDONESIA
+        </div>
+
+        <div class="author">
+            YUDI MAULANA
+        </div>
+
+        <div class="info">
+            A thesis submitted in fulfilment of the requirement for the award of the<br><br>
+            <b>Doctor of Philosophy in Mechanical Engineering</b><br><br>
+            Faculty of Mechanical and Manufacturing Engineering<br>
+            Universiti Tun Hussein Onn Malaysia<br><br>
+            January 2025
+        </div>
+
+        <div class="declaration">
+            <div class="declaration-title">STUDENT DECLARATION</div>
+            “I hereby declare that the work in this thesis is my own except for quotations
+            and summaries which have been duly acknowledged.”<br><br>
+
+            <b>Student:</b> Yudi Maulana<br>
+            <b>Date:</b> 22 January 2025<br><br>
+
+            <b>Supervisor:</b> Prof. Ir. Ts. Dr. Bukhari Bin Manshoor<br>
+            <b>Supervisor:</b> Ir. Dr.-Eng. Mairiza Zainuddin
+        </div>
+
+        <div class="hero-btn-anchor"></div>
     </div>
-
-    <div class="hero-subtitle">
-        AT BANTEN PROVINCE, INDONESIA
-    </div>
-
-    <div class="author">
-        YUDI MAULANA
-    </div>
-
-    <div class="info">
-        A thesis submitted in fulfilment of the requirement for the award of the<br><br>
-        <b>Doctor of Philosophy in Mechanical Engineering</b><br><br>
-        Faculty of Mechanical and Manufacturing Engineering<br>
-        Universiti Tun Hussein Onn Malaysia<br><br>
-        January 2025
-    </div>
-
-    <div class="declaration">
-        <div class="declaration-title">STUDENT DECLARATION</div>
-        “I hereby declare that the work in this thesis is my own except for quotations
-        and summaries which have been duly acknowledged.”<br><br>
-
-        <b>Student:</b> Yudi Maulana<br>
-        <b>Date:</b> 22 January 2025<br><br>
-
-        <b>Supervisor:</b> Prof. Ir. Ts. Dr. Bukhari Bin Manshoor<br>
-        <b>Supervisor:</b> Ir. Dr.-Eng. Mairiza Zainuddin
-    </div>
-
-    <div class="hero-btn-anchor"></div>
-</div>
-""", unsafe_allow_html=True)
+    """,
+    unsafe_allow_html=True
+)
 
 # =============================
 # BUTTON (STREAMLIT NATIVE, VISUALLY INSIDE HERO)
 # =============================
 st.markdown("<div class='hero-btn'>", unsafe_allow_html=True)
 
-if st.button("🚀 Enter Simulation Application"):
+if st.button("🚀 Run Simulation"):
     st.switch_page("pages/1_Fuzzy_System.py")
 
 st.markdown("</div>", unsafe_allow_html=True)
+
