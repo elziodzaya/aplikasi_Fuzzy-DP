@@ -119,6 +119,13 @@ st.markdown("""
     <div class="author">
         YUDI MAULANA
     </div>
+    <div class="info">
+        A thesis submitted in fulfilment of the requirement for the award of the<br><br>
+        <b>Doctor of Philosophy in Mechanical Engineering</b><br><br>
+        Faculty of Mechanical and Manufacturing Engineering<br>
+        Universiti Tun Hussein Onn Malaysia<br><br>
+        January 2025
+    </div>
 </div>
 """, unsafe_allow_html=True)
 
@@ -127,13 +134,7 @@ st.markdown("""
 # INFO
 # =============================
 st.markdown("""
-<div class="info">
-A thesis submitted in fulfilment of the requirement for the award of the<br><br>
-<b>Doctor of Philosophy in Mechanical Engineering</b><br><br>
-Faculty of Mechanical and Manufacturing Engineering<br>
-Universiti Tun Hussein Onn Malaysia<br><br>
-January 2025
-</div>
+
 """, unsafe_allow_html=True)
 
 # =============================
@@ -162,4 +163,5 @@ st.markdown("""
     <b>Supervisor:</b> Ir. Dr.-Eng. Mairiza Zainuddin
 </div>
 """, unsafe_allow_html=True)
+
 
