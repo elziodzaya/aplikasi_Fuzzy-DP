@@ -136,18 +136,20 @@ st.markdown("""
             <b>Supervisor:</b> Ir. Dr.-Eng. Mairiza Zainuddin<br>
         </div>
     </div>
+   st.markdown("<div class='btn-wrap'>", unsafe_allow_html=True)
+if st.button("🚀 Enter Simulation Application"):
+    st.session_state["page"] = "simulation"
+st.markdown("</div>", unsafe_allow_html=True)
+
+st.markdown("<div class='divider'></div>", unsafe_allow_html=True) 
 </div>
 """, unsafe_allow_html=True)
 
 # =============================
 # BUTTON
 # =============================
-st.markdown("<div class='btn-wrap'>", unsafe_allow_html=True)
-if st.button("🚀 Enter Simulation Application"):
-    st.session_state["page"] = "simulation"
-st.markdown("</div>", unsafe_allow_html=True)
 
-st.markdown("<div class='divider'></div>", unsafe_allow_html=True)
+
 
 
 
