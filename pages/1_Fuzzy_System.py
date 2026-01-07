@@ -12,7 +12,7 @@ from io import BytesIO
 # CONFIG
 # =========================================================
 st.set_page_config(page_title="Fuzzy Import System", layout="wide")
-st.title("📊 Prediksi Kebutuhan Impor Dengan Sistem Fuzzy")
+st.title("📊 Import Requirement Forecasting with a Fuzzy System")
 
 # =========================================================
 # BUILD FUZZY SYSTEM
@@ -151,8 +151,8 @@ if uploaded_file:
             df['Prediksi_Impor_Fuzzy'],
             marker='o'
         )
-        ax.set_xlabel("Bulan")
-        ax.set_ylabel("Jumlah Impor")
+        ax.set_xlabel("Month")
+        ax.set_ylabel("Total Import")
         ax.set_title("Time Series Import Prediction")
         ax.grid(True)
         plt.xticks(rotation=45)
@@ -178,4 +178,5 @@ if uploaded_file:
             file_name="fuzzy_predictions.xlsx",
             mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
         )
+
 
