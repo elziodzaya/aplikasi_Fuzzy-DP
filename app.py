@@ -19,22 +19,22 @@ body {
     color: #e5e7eb;
 }
 
-/* main width */
+/* main container */
 .block-container {
     padding-top: 40px;
     max-width: 900px;
 }
 
-/* HERO TITLE CARD */
+/* HERO CARD */
 .hero {
     background: linear-gradient(180deg, #102a43, #0b2239);
     border-left: 6px solid #3b82f6;
-    padding: 36px 32px;
+    padding: 36px 32px 20px 32px;
     border-radius: 16px;
     box-shadow: 0 12px 35px rgba(0,0,0,0.45);
-    margin-bottom: 30px;
 }
 
+/* title */
 .hero-title {
     text-align: center;
     font-size: 30px;
@@ -44,6 +44,7 @@ body {
     letter-spacing: 0.4px;
 }
 
+/* subtitle */
 .hero-subtitle {
     text-align: center;
     font-size: 15px;
@@ -56,43 +57,31 @@ body {
     text-align: center;
     font-size: 18px;
     font-weight: 600;
-    margin: 25px 0 30px 0;
+    margin: 26px 0 30px 0;
     color: #f8fafc;
 }
 
 /* info card */
 .info {
     background: #0f2a44;
-    padding: 26px;
+    padding: 24px;
     border-radius: 14px;
     text-align: center;
     font-size: 14px;
     color: #e2e8f0;
-    box-shadow: 0 10px 28px rgba(0,0,0,0.35);
-}
-
-/* button */
-.btn-wrap {
-    display: flex;
-    justify-content: center;
-    margin: 45px 0;
-}
-
-/* divider */
-.divider {
-    height: 1px;
-    background: linear-gradient(90deg, transparent, #334155, transparent);
-    margin: 35px 0;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.35);
+    margin-bottom: 20px;
 }
 
 /* declaration */
 .declaration {
     background: #081a2c;
-    padding: 26px;
+    padding: 24px;
     border-radius: 14px;
     font-size: 13px;
     color: #e5e7eb;
     box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+    margin-bottom: 25px;
 }
 
 .declaration-title {
@@ -101,11 +90,23 @@ body {
     margin-bottom: 14px;
     color: #ffffff;
 }
+
+/* button anchor & placement */
+.hero-btn-anchor {
+    height: 0;
+}
+
+.hero-btn {
+    display: flex;
+    justify-content: center;
+    margin-top: -10px;
+    margin-bottom: 10px;
+}
 </style>
 """, unsafe_allow_html=True)
 
 # =============================
-# HERO TITLE (VISIBLE & STRONG)
+# HERO CONTENT
 # =============================
 st.markdown("""
 <div class="hero">
@@ -113,12 +114,15 @@ st.markdown("""
         DYNAMIC SYSTEM MODEL TO IMPROVE THE RATIO AND EFFICIENCY IN THE SUPPLY CHAIN
         MANAGEMENT (SCM) DISTRIBUTION OF THE CEMENT INDUSTRY
     </div>
+
     <div class="hero-subtitle">
         AT BANTEN PROVINCE, INDONESIA
     </div>
+
     <div class="author">
         YUDI MAULANA
     </div>
+
     <div class="info">
         A thesis submitted in fulfilment of the requirement for the award of the<br><br>
         <b>Doctor of Philosophy in Mechanical Engineering</b><br><br>
@@ -126,28 +130,29 @@ st.markdown("""
         Universiti Tun Hussein Onn Malaysia<br><br>
         January 2025
     </div>
+
     <div class="declaration">
         <div class="declaration-title">STUDENT DECLARATION</div>
-            “I hereby declare that the work in this thesis is my own except for quotations
-            and summaries which have been duly acknowledged.”<br><br>
-            <b>Student:</b> Yudi Maulana<br>
-            <b>Date:</b> 22 January 2025<br><br>
-            <b>Supervisor:</b> Prof. Ir. Ts. Dr. Bukhari Bin Manshoor<br>
-            <b>Supervisor:</b> Ir. Dr.-Eng. Mairiza Zainuddin<br>
-        </div>
+        “I hereby declare that the work in this thesis is my own except for quotations
+        and summaries which have been duly acknowledged.”<br><br>
+
+        <b>Student:</b> Yudi Maulana<br>
+        <b>Date:</b> 22 January 2025<br><br>
+
+        <b>Supervisor:</b> Prof. Ir. Ts. Dr. Bukhari Bin Manshoor<br>
+        <b>Supervisor:</b> Ir. Dr.-Eng. Mairiza Zainuddin
     </div>
-    
+
+    <div class="hero-btn-anchor"></div>
 </div>
 """, unsafe_allow_html=True)
 
+# =============================
+# BUTTON (STREAMLIT NATIVE, VISUALLY INSIDE HERO)
+# =============================
+st.markdown("<div class='hero-btn'>", unsafe_allow_html=True)
 
+if st.button("🚀 Enter Simulation Application"):
+    st.switch_page("pages/1_Fuzzy_System.py")
 
-
-
-
-
-
-
-
-
-
+st.markdown("</div>", unsafe_allow_html=True)
