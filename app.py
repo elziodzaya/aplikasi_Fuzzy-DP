@@ -17,7 +17,7 @@ def img_to_base64(path):
     with open(path, "rb") as f:
         return base64.b64encode(f.read()).decode()
 
-uthm_logo_base64 = img_to_base64("assets/uthm_logo.png")
+uthm_logo_base64 = img_to_base64("assets/LOGO-UTM.png")
 
 # =============================
 # CSS STYLE
@@ -192,3 +192,4 @@ with col2:
         st.switch_page("pages/1_Fuzzy_System.py")
 
 st.markdown("</div>", unsafe_allow_html=True)
+
