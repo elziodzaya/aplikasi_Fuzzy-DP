@@ -127,12 +127,6 @@ st.markdown("""
         Universiti Tun Hussein Onn Malaysia<br><br>
         January 2026
     </div>
-    st.markdown("<div style='text-align:center; margin-top:-20px;'>", unsafe_allow_html=True)
-        st.image(
-            "assets/uthm_logo.png",
-            width=110
-        )
-    st.markdown("</div>", unsafe_allow_html=True)
     <div class="declaration">
         <div class="declaration-title">STUDENT DECLARATION</div>
             “I hereby declare that the work in this thesis is my own except for quotations
