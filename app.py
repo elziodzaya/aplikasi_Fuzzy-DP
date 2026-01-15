@@ -36,7 +36,7 @@ body {{
 }}
 
 .container {{
-    max-width: 900px;
+    max-width: 500px;
     margin: 40px auto 60px auto;
 }}
 
@@ -181,6 +181,7 @@ body {{
             <b>Supervisor:</b> Ir. Dr.-Eng. Mairiza Zainuddin
         </div>
     </div>
+</div>
 </body>
 </html>
 """
@@ -194,6 +195,7 @@ col1, col2, col3 = st.columns([1, 2, 1])
 with col2:
     if st.button("🚀 Run Simulation", use_container_width=True):
         st.switch_page("pages/1_Fuzzy_System.py")
+
 
 
 
