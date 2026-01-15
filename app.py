@@ -89,8 +89,8 @@ body {{
 }}
 
 .uni-logo img {{
-    width: 180px;   /* LOGO LEBIH LEBAR */
-    max-width: 100%;
+    width: 100px;   /* LOGO LEBIH LEBAR */
+    max-width: 180%;
 }}
 
 .uni-degree {{
@@ -168,21 +168,19 @@ body {{
                 January 2026
             </div>
         </div>
-    </div>
+        <div class="declaration">
+            <div class="declaration-title">STUDENT DECLARATION</div>
+    
+            “I hereby declare that the work in this thesis is my own except for quotations
+            and summaries which have been duly acknowledged.”<br><br>
+    
+            <b>Student:</b> Yudi Maulana<br>
+            <b>Date:</b> 22 January 2026<br><br>
+    
+            <b>Supervisor:</b> Prof. Ir. Ts. Dr. Bukhari Bin Manshoor<br>
+            <b>Supervisor:</b> Ir. Dr.-Eng. Mairiza Zainuddin
+        </div>
 
-
-
-    <div class="declaration">
-        <div class="declaration-title">STUDENT DECLARATION</div>
-
-        “I hereby declare that the work in this thesis is my own except for quotations
-        and summaries which have been duly acknowledged.”<br><br>
-
-        <b>Student:</b> Yudi Maulana<br>
-        <b>Date:</b> 22 January 2026<br><br>
-
-        <b>Supervisor:</b> Prof. Ir. Ts. Dr. Bukhari Bin Manshoor<br>
-        <b>Supervisor:</b> Ir. Dr.-Eng. Mairiza Zainuddin
     </div>
 
 </div>
@@ -199,3 +197,4 @@ col1, col2, col3 = st.columns([1, 2, 1])
 with col2:
     if st.button("🚀 Run Simulation", use_container_width=True):
         st.switch_page("pages/1_Fuzzy_System.py")
+
