@@ -1,4 +1,11 @@
 import streamlit as st
+import base64
+
+def img_to_base64(path):
+    with open(path, "rb") as f:
+        return base64.b64encode(f.read()).decode()
+
+logo = img_to_base64("assets/LOGO-UTM.png")
 
 # =============================
 # PAGE CONFIG
@@ -70,14 +77,7 @@ body {
     color: #e2e8f0;
     box-shadow: 0 10px 28px rgba(0,0,0,0.35);
 }
-.uthm-logo {
-    margin-top: 14px;
-}
 
-.uthm-logo img {
-    width: 110px;
-    opacity: 0.95;
-}
 
 /* button */
 .btn-wrap {
@@ -131,10 +131,7 @@ st.markdown("""
         A thesis submitted in fulfilment of the requirement for the award of the<br><br>
         <b>Doctor of Philosophy in Mechanical Engineering</b><br><br>
         Faculty of Mechanical and Manufacturing Engineering<br>
-        Universiti Tun Hussein Onn Malaysia<br><br>
-        <div class="uthm-logo">
-            <img src="assets/LOGO-UTM.png">
-        </div>
+        Universiti Tun Hussein Onn Malaysia<br><br><img src="data:image/png;base64,{logo}" width="110"><br><br>
         January 2026
     </div>
     <div class="declaration">
@@ -159,6 +156,7 @@ col1, col2, col3 = st.columns([1, 2, 1])
 with col2:
     if st.button("🚀 Run Simulation ", use_container_width=True):
         st.switch_page("pages/1_Fuzzy_System.py")
+
 
 
 
