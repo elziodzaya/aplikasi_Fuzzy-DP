@@ -124,7 +124,10 @@ st.markdown("""
         <b>Doctor of Philosophy in Mechanical Engineering</b><br><br>
         Faculty of Mechanical and Manufacturing Engineering<br>
         Universiti Tun Hussein Onn Malaysia<br><br>
-        <img src="assets/LOGO-UTM.png" alt="Logo UTM" style="max-height: 60px; display: block; margin: 10px auto;"> January 2026
+        <div class="uthm-logo">
+            <img src="assets/LOGO-UTM.png">
+        </div>
+        January 2026
     </div>
     <div class="declaration">
         <div class="declaration-title">STUDENT DECLARATION</div>
@@ -148,6 +151,7 @@ col1, col2, col3 = st.columns([1, 2, 1])
 with col2:
     if st.button("🚀 Run Simulation ", use_container_width=True):
         st.switch_page("pages/1_Fuzzy_System.py")
+
 
 
 
