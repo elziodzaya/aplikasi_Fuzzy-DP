@@ -1,11 +1,4 @@
 import streamlit as st
-import base64
-
-def img_to_base64(path):
-    with open(path, "rb") as f:
-        return base64.b64encode(f.read()).decode()
-
-logo = img_to_base64("assets/LOGO-UTM.png")
 
 # =============================
 # PAGE CONFIG
@@ -131,9 +124,14 @@ st.markdown("""
         A thesis submitted in fulfilment of the requirement for the award of the<br><br>
         <b>Doctor of Philosophy in Mechanical Engineering</b><br><br>
         Faculty of Mechanical and Manufacturing Engineering<br>
-        Universiti Tun Hussein Onn Malaysia<br><br><img src="data:image/png;base64,{logo}" width="110"><br><br>
+        Universiti Tun Hussein Onn Malaysia<br><br>
         January 2026
     </div>
+    st.markdown("<div style='text-align:center; margin-top:-20px;'>", unsafe_allow_html=True)
+        st.image(
+            "assets/uthm_logo.png",
+            width=110
+        )
     <div class="declaration">
         <div class="declaration-title">STUDENT DECLARATION</div>
             “I hereby declare that the work in this thesis is my own except for quotations
@@ -156,6 +154,7 @@ col1, col2, col3 = st.columns([1, 2, 1])
 with col2:
     if st.button("🚀 Run Simulation ", use_container_width=True):
         st.switch_page("pages/1_Fuzzy_System.py")
+
 
 
 
