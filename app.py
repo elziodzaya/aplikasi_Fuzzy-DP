@@ -70,6 +70,14 @@ body {
     color: #e2e8f0;
     box-shadow: 0 10px 28px rgba(0,0,0,0.35);
 }
+.uthm-logo {
+    margin-top: 14px;
+}
+
+.uthm-logo img {
+    width: 110px;
+    opacity: 0.95;
+}
 
 /* button */
 .btn-wrap {
@@ -151,6 +159,7 @@ col1, col2, col3 = st.columns([1, 2, 1])
 with col2:
     if st.button("🚀 Run Simulation ", use_container_width=True):
         st.switch_page("pages/1_Fuzzy_System.py")
+
 
 
 
