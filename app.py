@@ -132,6 +132,7 @@ st.markdown("""
             "assets/uthm_logo.png",
             width=110
         )
+    st.markdown("</div>", unsafe_allow_html=True)
     <div class="declaration">
         <div class="declaration-title">STUDENT DECLARATION</div>
             “I hereby declare that the work in this thesis is my own except for quotations
@@ -154,6 +155,7 @@ col1, col2, col3 = st.columns([1, 2, 1])
 with col2:
     if st.button("🚀 Run Simulation ", use_container_width=True):
         st.switch_page("pages/1_Fuzzy_System.py")
+
 
 
 
