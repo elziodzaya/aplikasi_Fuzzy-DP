@@ -180,9 +180,7 @@ body {{
             <b>Supervisor:</b> Prof. Ir. Ts. Dr. Bukhari Bin Manshoor<br>
             <b>Supervisor:</b> Ir. Dr.-Eng. Mairiza Zainuddin
         </div>
-
     </div>
-
 </div>
 </body>
 </html>
@@ -197,6 +195,7 @@ col1, col2, col3 = st.columns([1, 2, 1])
 with col2:
     if st.button("🚀 Run Simulation", use_container_width=True):
         st.switch_page("pages/1_Fuzzy_System.py")
+
 
 
 
