@@ -89,7 +89,7 @@ body {{
 }}
 
 .uni-logo img {{
-    width: 100px;   /* LOGO LEBIH LEBAR */
+    width: 210px;   /* LOGO LEBIH LEBAR */
     max-width: 180%;
 }}
 
@@ -197,4 +197,5 @@ col1, col2, col3 = st.columns([1, 2, 1])
 with col2:
     if st.button("🚀 Run Simulation", use_container_width=True):
         st.switch_page("pages/1_Fuzzy_System.py")
+
 
