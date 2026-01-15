@@ -1,4 +1,5 @@
 import streamlit as st
+import base64
 
 # =============================
 # PAGE CONFIG
@@ -10,111 +11,122 @@ st.set_page_config(
 )
 
 # =============================
+# LOAD LOGO (BASE64)
+# =============================
+def img_to_base64(path):
+    with open(path, "rb") as f:
+        return base64.b64encode(f.read()).decode()
+
+uthm_logo_base64 = img_to_base64("assets/uthm_logo.png")
+
+# =============================
 # CSS STYLE
 # =============================
-st.markdown("""
+st.markdown(f"""
 <style>
-body {
+body {{
     background: linear-gradient(180deg, #081826 0%, #0b2239 100%);
     color: #e5e7eb;
-}
+}}
 
-/* main width */
-.block-container {
+.block-container {{
     padding-top: 40px;
     max-width: 900px;
-}
+}}
 
-/* HERO CARD */
-.hero {
+/* HERO */
+.hero {{
     background: linear-gradient(180deg, #102a43, #0b2239);
     border-left: 6px solid #3b82f6;
-    padding: 36px 32px;
+    padding: 36px 32px 40px 32px;
     border-radius: 16px;
     box-shadow: 0 12px 35px rgba(0,0,0,0.45);
-    margin-bottom: 30px;
-}
+    margin-bottom: 28px;
+}}
 
-/* TITLE */
-.hero-title {
+.hero-title {{
     text-align: center;
     font-size: 28px;
     font-weight: 800;
     line-height: 1.45;
     color: #ffffff;
-    letter-spacing: 0.4px;
-}
+}}
 
-.hero-subtitle {
+.hero-subtitle {{
     text-align: center;
     font-size: 15px;
     color: #cbd5e1;
     margin-top: 14px;
-}
+}}
 
-/* AUTHOR */
-.author {
+.author {{
     text-align: center;
     font-size: 18px;
     font-weight: 600;
-    margin: 25px 0 30px 0;
+    margin-top: 22px;
     color: #f8fafc;
-}
+}}
 
-/* UNIVERSITY CARD */
-.uni-card {
-    background: #0f2a44;
-    padding: 26px 20px 32px 20px;
+/* UNIVERSITY CARD (WATERMARK) */
+.uni-card {{
+    background:
+        linear-gradient(rgba(15,42,68,0.94), rgba(15,42,68,0.94)),
+        url("data:image/png;base64,{uthm_logo_base64}");
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: 200px;
+    padding: 36px 24px;
     border-radius: 14px;
     text-align: center;
     color: #e2e8f0;
     box-shadow: 0 10px 28px rgba(0,0,0,0.35);
-}
+}}
 
-.uni-degree {
+.uni-degree {{
     font-weight: 700;
     font-size: 15px;
     color: #ffffff;
-    margin-bottom: 16px;
-}
+    margin-bottom: 14px;
+}}
 
-.uni-text {
+.uni-text {{
     font-size: 14px;
     line-height: 1.6;
-}
+}}
 
 /* DECLARATION */
-.declaration {
+.declaration {{
     background: #081a2c;
     padding: 26px;
     border-radius: 14px;
     font-size: 13px;
     color: #e5e7eb;
     box-shadow: 0 8px 24px rgba(0,0,0,0.4);
-    margin-top: 35px;
-}
+    margin-top: 36px;
+}}
 
-.declaration-title {
+.declaration-title {{
     text-align: center;
     font-weight: 600;
     margin-bottom: 14px;
     color: #ffffff;
-}
+}}
 
 /* BUTTON */
-.btn-wrap {
+.btn-wrap {{
     display: flex;
     justify-content: center;
-    margin: 45px 0;
-}
+    margin: 42px 0;
+}}
 </style>
 """, unsafe_allow_html=True)
 
 # =============================
-# HERO SECTION
+# HERO + UNIVERSITY CARD
 # =============================
 st.markdown("""
 <div class="hero">
+
     <div class="hero-title">
         DYNAMIC SYSTEM MODEL TO IMPROVE THE RATIO AND EFFICIENCY IN THE SUPPLY CHAIN
         MANAGEMENT (SCM) DISTRIBUTION OF THE CEMENT INDUSTRY
@@ -127,33 +139,29 @@ st.markdown("""
     <div class="author">
         YUDI MAULANA
     </div>
+
+    <div style="margin-top:30px;">
+        <div class="uni-card">
+            <div class="uni-degree">
+                Doctor of Philosophy in Mechanical Engineering
+            </div>
+            <div class="uni-text">
+                Faculty of Mechanical and Manufacturing Engineering<br>
+                Universiti Tun Hussein Onn Malaysia
+            </div>
+        </div>
+    </div>
+
 </div>
 """, unsafe_allow_html=True)
 
 # =============================
-# UNIVERSITY CARD + LOGO
+# YEAR
 # =============================
-st.markdown("""
-<div class="uni-card">
-    <div class="uni-degree">
-        Doctor of Philosophy in Mechanical Engineering
-    </div>
-    <div class="uni-text">
-        Faculty of Mechanical and Manufacturing Engineering<br>
-        Universiti Tun Hussein Onn Malaysia
-    </div>
-</div>
-""", unsafe_allow_html=True)
-
-st.markdown("<div style='text-align:center; margin-top:-22px;'>", unsafe_allow_html=True)
-st.image("assets/LOGO-UTM.png", width=110)
-st.markdown("</div>", unsafe_allow_html=True)
-
-st.markdown("""
-<div style="text-align:center; margin-top:10px; color:#cbd5e1;">
-    January 2026
-</div>
-""", unsafe_allow_html=True)
+st.markdown(
+    "<div style='text-align:center; margin-top:10px; color:#cbd5e1;'>January 2026</div>",
+    unsafe_allow_html=True
+)
 
 # =============================
 # STUDENT DECLARATION
@@ -161,6 +169,7 @@ st.markdown("""
 st.markdown("""
 <div class="declaration">
     <div class="declaration-title">STUDENT DECLARATION</div>
+
     “I hereby declare that the work in this thesis is my own except for quotations
     and summaries which have been duly acknowledged.”<br><br>
 
